@@ -20,7 +20,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("main")
+    mainClass.set("Main")
 }
 
 
