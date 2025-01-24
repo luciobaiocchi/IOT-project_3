@@ -4,6 +4,7 @@
 #include "ModeTask.h"
 #include "GateTask.h"
 #include "SerialCommTask.h"
+#include "LCDTask.h"
 
 Scheduler scheduler;
 
@@ -22,8 +23,13 @@ void setup() {
   //Task* serialComm = new SerialCommTask(prop);
   //serialComm->init(200);
 
+  Task* lcdTask = new LCDTask(prop);
+  lcdTask->init(300);
+  
+
  // scheduler.addTask(modeTask);
   scheduler.addTask(gateTask);
+  scheduler.addTask(lcdTask);
 }
 
 void loop() {

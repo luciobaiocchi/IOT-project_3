@@ -4,7 +4,7 @@ LCDTask::LCDTask(Properties &prop): prop(prop){
     lcd = new LiquidCrystal_I2C(0x27, 16, 2);
     lcd->init();
     lcd->backlight();
-    displayManual();
+    display();
 }
 
 void LCDTask::init(int period){
