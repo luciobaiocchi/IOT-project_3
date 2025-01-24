@@ -18,10 +18,10 @@ public class Logic {
     public void run(){
         while (true) {
             switch (mState) {
-                case MainState.AUTOMATIC:
+                case AUTOMATIC:
                     runAuto();
                     break;
-                case MainState.MANUAL:
+                case MANUAL:
                     runMan();
                     break;
             
@@ -34,13 +34,13 @@ public class Logic {
     private void runAuto(){
         tState = tManager.getTempState();
         switch (tState) {
-            case TempState.NORMAL:
+            case NORMAL:
             
                 break;
-            case TempState.HOT:
+            case HOT:
                 
             break;
-            case TempState.TOO_HOT:
+            case TOO_HOT:
                 
             break;
         

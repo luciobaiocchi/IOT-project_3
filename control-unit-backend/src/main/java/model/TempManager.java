@@ -9,6 +9,7 @@ import model.TempState;
 public class TempManager {
     private final List<Integer> tempList = new ArrayList<>();
     private TempState tState = TempState.NORMAL;
+    private int maxVal;
     long startTime;
 
     public TempManager(final int max){
