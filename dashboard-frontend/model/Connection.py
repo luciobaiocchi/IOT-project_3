@@ -1,3 +1,4 @@
+# model/connection.py
 import asyncio
 import random
 from aiohttp import ClientSession
@@ -32,8 +33,7 @@ class Connection:
         print("Getting data items...")
         async with session.get(url) as response:
             print(f"Getting - Received response with status code: {response.status}")
-            data = await response.json()
-            print(data)
+            return await response.json()
 
     async def run(self):
         """
@@ -42,4 +42,5 @@ class Connection:
         async with ClientSession() as session:
             await self.post_data(session)
             await asyncio.sleep(1)  # Attendi 1 secondo
-            await self.get_data(session)
+            return await self.get_data(session)
+        
