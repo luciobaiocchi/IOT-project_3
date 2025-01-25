@@ -35,10 +35,11 @@ void LCDTask::displayNewMode() {
         lcd->print("MANUAL");
     }else {
         lcd->print("AUTOMATIC");
-        message = "       T:23";
+        message = "    T:23";
     }
-    lcd->setCursor(0, 1);
+    displayNewPos();
     lcd->print(message);
+    
 }
 
 void LCDTask::displayNewPos() {
