@@ -4,7 +4,9 @@ LCDTask::LCDTask(Properties &prop): prop(prop){
     lcd = new LiquidCrystal_I2C(0x27, 16, 2);
     lcd->init();
     lcd->backlight();
-    display();
+    displayNewMode();
+    currentMode = Mode::AUTOMATIC;
+    currentPos = -1;
 }
 
 void LCDTask::init(int period){
@@ -13,25 +15,36 @@ void LCDTask::init(int period){
 
 /* Temp control to be implemented.*/
 void LCDTask::tick() {
-    if (currentPos != prop.getPos() || currentMode != prop.getMode()) {
+    if (currentMode != prop.getMode()) {
         currentMode = prop.getMode();
-        currentPos = prop.getPos();
-        display();
+        displayNewMode();
     }
+    if (currentPos != prop.getPos()) {
+        currentPos = prop.getPos();
+        displayNewPos();
+    }
+
 }
 
-void LCDTask::display(){
+void LCDTask::displayNewMode() {
     String message;
     lcd->clear();
     lcd->home();
+
     if (currentMode == Mode::MANUAL){
         lcd->print("MANUAL");
-        message = "Pos:" + (String)currentPos;
     }else {
         lcd->print("AUTOMATIC");
-        message = "Pos:" + (String)currentPos + "T:23";
+        message = "       T:23";
     }
-    lcd->setCursor(1, 0);
+    lcd->setCursor(0, 1);
     lcd->print(message);
 }
+
+void LCDTask::displayNewPos() {
+    lcd->setCursor(0, 1);
+    lcd->print("Pos:" + (String)currentPos);
+}
+
+
 

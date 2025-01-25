@@ -12,10 +12,11 @@ void GateTask::init(int period) {
 void GateTask::tick() {
     if (prop.getMode() == Mode::MANUAL){
         gate->checkServo();
-        Serial.println(pot->getPos());
-        Serial.println(gate->getPos());
+        //Serial.println(pot->getPos());
+        //Serial.println(gate->getPos());
         if (pot->getPos() >= gate->getPos()+3 || pot->getPos() <= gate->getPos()-3 ){
             gate->move(pot->getPos());
+            prop.setPosition(pot->getPos());
         }
     }
 }
