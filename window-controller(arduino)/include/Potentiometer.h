@@ -11,6 +11,7 @@ public:
 private:
     int potPin;
     int pos;
+    int arr[20] = {0};
 };
 
 

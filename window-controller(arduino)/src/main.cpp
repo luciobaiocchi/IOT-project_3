@@ -13,9 +13,11 @@ void setup() {
   scheduler.init(50);
   Properties prop = Properties();
 
+  Serial.begin(9600);
 
-  //Task* modeTask = new ModeTask(1, prop);
-  //modeTask->init(100);
+
+  Task* modeTask = new ModeTask(13, prop);
+  modeTask->init(200);
 
   Task* gateTask = new GateTask(prop, 5);
   gateTask->init(100);
@@ -23,13 +25,13 @@ void setup() {
   //Task* serialComm = new SerialCommTask(prop);
   //serialComm->init(200);
 
-  Task* lcdTask = new LCDTask(prop);
-  lcdTask->init(300);
+  //Task* lcdTask = new LCDTask(prop);
+  //lcdTask->init(300);
   
 
- // scheduler.addTask(modeTask);
   scheduler.addTask(gateTask);
-  scheduler.addTask(lcdTask);
+  scheduler.addTask(modeTask);
+  //scheduler.addTask(lcdTask);
 }
 
 void loop() {

@@ -1,6 +1,6 @@
 #include "Gate.h"
 
-#define DETACH_TICK 3
+#define DETACH_TICK 10
 
 Gate::Gate(int servoPin) { 
     this->servoPin = servoPin;
@@ -22,6 +22,7 @@ int Gate::getPos(){
 }
 
 void Gate::move(int pos){
+    currentPos = pos;
     servo.attach(servoPin);
     detachCounter = DETACH_TICK;
     servo.write(pos);
