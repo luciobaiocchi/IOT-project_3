@@ -17,6 +17,8 @@ class TemperatureDashboard:
         self.elapsed_times = []           # Lista tempi trascorsi
         self.temperatures = []            # Lista temperature
         self.status_history = []          # Lista stati
+        self.opening_level = 0
+        self.mode = "AUTOMATIC"
         self._setup_gui()
         self.schedule_auto_update()
 
@@ -53,6 +55,10 @@ class TemperatureDashboard:
                     latest = data[-1]
                     self.temperatures.append(latest['val'])
                     self.status_history.append(latest['tst'])
+
+                    self.opening_level = latest['opn']
+                    self.mode = latest['main_state']
+                    
                     
                     # Filtra i dati degli ultimi 30 secondi
                     current_time = self.elapsed_times[-1]
@@ -66,13 +72,15 @@ class TemperatureDashboard:
                         last_30_temps,
                         max(last_30_temps) if last_30_temps else 0,
                         min(last_30_temps) if last_30_temps else 0,
-                        last_30_status[-1] if last_30_status else "N/A"
+                        last_30_status[-1] if last_30_status else "N/A",
+                        self.opening_level,
+                        self.mode
                     ))
                 except Exception as e:
                     print(f"Errore: {e}")
         asyncio.run_coroutine_threadsafe(async_update(), self.loop)
 
-    def _update_plot(self, times, temps, current_max, current_min, current_status):
+    def _update_plot(self, times, temps, current_max, current_min, current_status, opening_level, mode):
         self.ax.clear()
         
         # Plot dati principali
@@ -83,7 +91,7 @@ class TemperatureDashboard:
         self.ax.axhline(current_min, color='#1a9641', linestyle='--', label=f'Min: {current_min}°C')
         
         # Informazioni a destra
-        textstr = f"Max: {current_max}°C\nMin: {current_min}°C\nStatus: {current_status}"
+        textstr = f"Max: {current_max}°C\nMin: {current_min}°C\nStatus: {current_status}\nOpening Level: {opening_level}\nMode: {mode}"
         self.ax.text(
             1.05, 0.5, textstr, 
             transform=self.ax.transAxes,

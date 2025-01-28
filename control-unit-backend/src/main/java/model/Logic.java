@@ -1,22 +1,27 @@
 package model;
 
 import model.TempManager;
-import model.MainState;
+import connections.http.DataService;
+import io.vertx.core.Vertx;
+import model.MainStateType;
 import model.TempState;
 
 public class Logic {
-    private final TempManager tManager;
     /*Contiene stato automatico o manuale */
-    private MainState mState = MainState.AUTOMATIC;
-    private TempState tState = TempState.NORMAL;
+    private Mode mode = new Mode();
+    private TempManager tManager = new TempManager(200);
 
-    public Logic(final TempManager tManager){
-        this.tManager = tManager;
+    public Logic(){
+        Vertx vertx = Vertx.vertx();
+        DataService service = new DataService(8080, tManager, mode);
+        vertx.deployVerticle(service);
+        
     }
 
     public void run(){
+
         while (true) {
-            switch (mState) {
+            switch (mode.getMode()) {
                 case AUTOMATIC:
                     runAuto();
                     break;
@@ -30,8 +35,7 @@ public class Logic {
     }
 
     private void runAuto(){
-        tState = tManager.getTempState();
-        switch (tState) {
+        switch (tManager.getTempState()) {
             /*entry/f=f1
             entry/winClosed()
             do/readFreq()*/

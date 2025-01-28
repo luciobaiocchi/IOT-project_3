@@ -39,9 +39,9 @@ class Connection:
         """
         Invia una nuova modalità al server.
         """
-        url = f"http://{self.host}:{self.port}/api/mode"
+        url = f"http://{self.host}:{self.port}/api/data"
         print(f"Posting new mode: {mode}...")
-        async with session.post(url, json={"mode": mode}) as response:
+        async with session.post(url, json={"new_mode": mode}) as response:
             print(f"Posting mode - Received response with status code: {response.status}")
             return await response.json()
 

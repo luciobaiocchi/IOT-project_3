@@ -58,6 +58,14 @@ public class TempManager {
         tempList.add(temp);
     }
 
+    public void setOpening(final int opening){
+        this.openLevel = opening;
+    }
+
+    public int getOpening(){
+        return openLevel;
+    }
+
     public void startTimer() {
         this.startTime = System.currentTimeMillis();
     }

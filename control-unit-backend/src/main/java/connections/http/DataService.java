@@ -8,6 +8,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.common.template.TemplateEngine;
 import io.vertx.ext.web.handler.BodyHandler;
+import model.Mode;
 import model.TempManager;
 
 import java.util.Date;
@@ -19,10 +20,12 @@ public class DataService extends AbstractVerticle {
     private int port;
     private static final int MAX_SIZE = 10;
     private TempManager tManager;
+	private Mode mState;
     private Random random;
 
-    public DataService(int port, final TempManager tManager) {
+    public DataService(final int port, final TempManager tManager, final Mode mState) {
 		this.tManager = tManager;
+		this.mState = mState;
         this.port = port;
         this.random = new Random();
     }
@@ -44,10 +47,13 @@ public class DataService extends AbstractVerticle {
     private void handleAddNewData(RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();
         JsonObject res = routingContext.getBodyAsJson();
-		log("post");
+		log("post" + res);
         if (res == null) {
             sendError(400, response);
         } else {
+			if (res.containsKey("new_mode")){
+				this.mState.changeMode();;
+			}
             /*float value = generateRandomTemperature(); // Genera una temperatura casuale
             String place = "random_place";
             long time = System.currentTimeMillis();
@@ -69,6 +75,8 @@ public class DataService extends AbstractVerticle {
 		data.put("min", tManager.getMin());
 		data.put("val", tManager.getLast());
 		data.put("tst", tManager.getTempState());
+		data.put("opn", tManager.getOpening());
+		data.put("main_state", mState.getMode());
 		arr.add(data);
         routingContext.response()
 		.putHeader("content-type", "application/json")
