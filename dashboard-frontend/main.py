@@ -1,21 +1,10 @@
-# main.py
 import asyncio
-from model.connection import Connection  # Importa la classe Connection
+from threading import Thread
 from view.View import TemperatureDashboard  # Importa la classe TemperatureDashboard
+from model.Connection import Connection # Importa la classe Connection
 
 
 class Main:
-    @staticmethod
-    async def run_connection(connection):
-        """
-        Esegue le operazioni di connessione con gestione degli errori.
-        """
-        try:
-            return await connection.run()
-        except Exception as e:
-            print(f"Errore: {e}")
-            return []
-
     @staticmethod
     def main():
         """
@@ -28,11 +17,13 @@ class Main:
         # Crea un'istanza della classe Connection
         connection = Connection(host, port)
 
-        # Esegui le operazioni asincrone e ottieni i dati
-        data = asyncio.run(Main.run_connection(connection))
+        # Crea un event loop dedicato per operazioni asincrone
+        loop = asyncio.new_event_loop()
+        t = Thread(target=loop.run_forever, daemon=True)
+        t.start()
 
         # Avvia il dashboard con i dati recuperati
-        dashboard = TemperatureDashboard(connection)
+        dashboard = TemperatureDashboard(connection, loop)
         dashboard.root.mainloop()
 
 

@@ -1,4 +1,3 @@
-# model/connection.py
 import asyncio
 import random
 from aiohttp import ClientSession
@@ -32,7 +31,18 @@ class Connection:
         url = f"http://{self.host}:{self.port}/api/data"
         print("Getting data items...")
         async with session.get(url) as response:
+            print(response)
             print(f"Getting - Received response with status code: {response.status}")
+            return await response.json()
+
+    async def post_mode(self, session: ClientSession, mode: str):
+        """
+        Invia una nuova modalità al server.
+        """
+        url = f"http://{self.host}:{self.port}/api/mode"
+        print(f"Posting new mode: {mode}...")
+        async with session.post(url, json={"mode": mode}) as response:
+            print(f"Posting mode - Received response with status code: {response.status}")
             return await response.json()
 
     async def run(self):
@@ -43,4 +53,3 @@ class Connection:
             await self.post_data(session)
             await asyncio.sleep(1)  # Attendi 1 secondo
             return await self.get_data(session)
-        

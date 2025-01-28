@@ -9,7 +9,6 @@ public class Logic {
     /*Contiene stato automatico o manuale */
     private MainState mState = MainState.AUTOMATIC;
     private TempState tState = TempState.NORMAL;
-    private int doorPos = 0;
 
     public Logic(final TempManager tManager){
         this.tManager = tManager;
@@ -24,7 +23,6 @@ public class Logic {
                 case MANUAL:
                     runMan();
                     break;
-            
                 default:
                     break;
             }
@@ -34,12 +32,22 @@ public class Logic {
     private void runAuto(){
         tState = tManager.getTempState();
         switch (tState) {
+            /*entry/f=f1
+            entry/winClosed()
+            do/readFreq()*/
             case NORMAL:
-            
+
                 break;
+            /*entry/f=f2
+            do/winOpenProp()
+            do/readFreq()*/
             case HOT:
                 
             break;
+            /*entry/f=
+            do/winOpenProp()
+            do/readFreq()*/
+
             case TOO_HOT:
                 
             break;

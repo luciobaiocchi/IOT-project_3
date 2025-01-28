@@ -1,90 +1,112 @@
-# view/View.py
 import matplotlib
-matplotlib.use('TkAgg')  # Forza il backend prima di ogni import
-
+matplotlib.use('TkAgg')
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from datetime import datetime
-
+from aiohttp import ClientSession
+import asyncio
 
 class TemperatureDashboard:
-    def __init__(self, connection):
-        """
-        Inizializza il dashboard con una connessione.
-        """
-        self.connection = connection  # Salva l'istanza di Connection
+    def __init__(self, connection, loop):
+        self.connection = connection
+        self.loop = loop
         self.root = tk.Tk()
-        self.root.tk.call('tk', 'scaling', 2.0)  # Risoluzione HiDPI
+        self.root.tk.call('tk', 'scaling', 2.0)
+        self.start_time = datetime.now()  # Tempo iniziale
+        self.elapsed_times = []           # Lista tempi trascorsi
+        self.temperatures = []            # Lista temperature
+        self.status_history = []          # Lista stati
         self._setup_gui()
+        self.schedule_auto_update()
 
     def _setup_gui(self):
-        """Configura l'interfaccia grafica"""
         self.root.title("Monitor Temperatura")
         self.root.geometry("1200x800")
-
-        # Container principale
+        
         main_container = tk.Frame(self.root)
         main_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
-
-        # Frame per il grafico
-        self.graph_frame = tk.Frame(main_container)
-        self.graph_frame.pack(fill=tk.BOTH, expand=True)
-
-        # Inizializza il grafico vuoto
+        
         self.figure = Figure(figsize=(10, 6), dpi=100)
         self.ax = self.figure.add_subplot(111)
-        self.canvas = FigureCanvasTkAgg(self.figure, master=self.graph_frame)
+        self.canvas = FigureCanvasTkAgg(self.figure, master=main_container)
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-
-        # Pulsante di aggiornamento
-        btn_refresh = tk.Button(
-            main_container,
-            text="Aggiorna Dati",
-            command=self.update_data,
-            font=('Helvetica', 12),
-            padx=15,
-            pady=10
-        )
-        btn_refresh.pack(pady=20)
+        
+        button_frame = tk.Frame(main_container)
+        button_frame.pack(pady=10)
+        
+        tk.Button(button_frame, text="Aggiorna Dati", command=self.update_data,
+                 font=('Helvetica', 12), padx=15, pady=10).pack(side=tk.LEFT, padx=10)
+        tk.Button(button_frame, text="Change mode", command=self.change_mode,
+                 font=('Helvetica', 12), padx=15, pady=10).pack(side=tk.LEFT, padx=10)
 
     def update_data(self):
-        """Aggiorna il grafico con dati reali"""
-        try:
-            # Recupera dati dalla connessione
-            data = self.connection.get_data()  # Supponiamo che Connection abbia un metodo get_data()
+        async def async_update():
+            async with ClientSession() as session:
+                try:
+                    data = await self.connection.get_data(session)
+                    # Calcola tempo trascorso dall'avvio
+                    elapsed = (datetime.now() - self.start_time).total_seconds()
+                    self.elapsed_times.append(elapsed)
+                    
+                    # Estrai ultimi valori
+                    latest = data[-1]
+                    self.temperatures.append(latest['val'])
+                    self.status_history.append(latest['tst'])
+                    
+                    # Filtra i dati degli ultimi 30 secondi
+                    current_time = self.elapsed_times[-1]
+                    last_30_seconds = [t for t in self.elapsed_times if t >= current_time - 30]
+                    last_30_temps = self.temperatures[-len(last_30_seconds):]
+                    last_30_status = self.status_history[-len(last_30_seconds):]
+                    
+                    # Aggiorna grafico con dati degli ultimi 30 secondi
+                    self.root.after(0, lambda: self._update_plot(
+                        last_30_seconds,
+                        last_30_temps,
+                        max(last_30_temps) if last_30_temps else 0,
+                        min(last_30_temps) if last_30_temps else 0,
+                        last_30_status[-1] if last_30_status else "N/A"
+                    ))
+                except Exception as e:
+                    print(f"Errore: {e}")
+        asyncio.run_coroutine_threadsafe(async_update(), self.loop)
 
-            # Elabora i dati
-            dates = [datetime.fromtimestamp(entry['time'] / 1000) for entry in data]  # Converti timestamp in datetime
-            temps = [entry['value'] for entry in data]
-
-            # Aggiorna il grafico
-            self._update_plot(dates, temps)
-
-        except Exception as e:
-            print(f"Errore: {e}")
-
-    def _update_plot(self, dates, temperatures):
-        """Aggiorna il grafico con nuovi dati"""
+    def _update_plot(self, times, temps, current_max, current_min, current_status):
         self.ax.clear()
-
-        # Plot dati
-        self.ax.plot(dates, temperatures, marker='o', linestyle='-', color='#2c7bb6')
-
+        
+        # Plot dati principali
+        self.ax.plot(times, temps, marker='o', linestyle='-', color='#2c7bb6')
+        
         # Linee max/min
-        max_temp = max(temperatures)
-        min_temp = min(temperatures)
-        self.ax.axhline(max_temp, color='#d7191c', linestyle='--', label=f'Max: {max_temp}°C')
-        self.ax.axhline(min_temp, color='#1a9641', linestyle='--', label=f'Min: {min_temp}°C')
-
-        # Formattazione
-        self.ax.set_title("Andamento Temperatura Ultimi 7 Giorni", fontsize=14, pad=20)
-        self.ax.set_xlabel("Data", fontsize=12)
-        self.ax.set_ylabel("Temperatura (°C)", fontsize=12)
-        self.ax.tick_params(axis='x', rotation=45)
+        self.ax.axhline(current_max, color='#d7191c', linestyle='--', label=f'Max: {current_max}°C')
+        self.ax.axhline(current_min, color='#1a9641', linestyle='--', label=f'Min: {current_min}°C')
+        
+        # Informazioni a destra
+        textstr = f"Max: {current_max}°C\nMin: {current_min}°C\nStatus: {current_status}"
+        self.ax.text(
+            1.05, 0.5, textstr, 
+            transform=self.ax.transAxes,
+            va='center',
+            bbox=dict(facecolor='white', alpha=0.5)
+        )
+        
+        # Formattazione assi
+        self.ax.set_xlabel("Tempo trascorso (s)")
+        self.ax.set_ylabel("Temperatura (°C)")
+        self.ax.set_title("Andamento Temperatura (Ultimi 30 secondi)")
         self.ax.grid(True, alpha=0.3)
-        self.ax.legend()
-
-        # Ridisegna il canvas
+        self.ax.legend(loc='upper left')
+        
         self.figure.tight_layout()
         self.canvas.draw()
+
+    def schedule_auto_update(self):
+        self.root.after(500, self.schedule_auto_update)
+        self.update_data()
+
+    def change_mode(self):
+        async def async_post_mode():
+            async with ClientSession() as session:
+                await self.connection.post_mode(session, "new_mod")
+        asyncio.run_coroutine_threadsafe(async_post_mode(), self.loop)

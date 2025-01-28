@@ -12,4 +12,5 @@ public class Constants {
     public static int max_too_hot = 35;
 
     public static int DT_millis = 10000;
+
 }
