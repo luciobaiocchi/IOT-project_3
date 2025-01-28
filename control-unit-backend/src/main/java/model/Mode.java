@@ -1,21 +1,21 @@
 package model;
 
 public class Mode {
-    private MainStateType mainState = MainStateType.AUTOMATIC;
+    private ModeType mainState = ModeType.AUTOMATIC;
 
     public void MainState(){
 
     }
 
     public void changeMode(){
-        if (mainState == MainStateType.AUTOMATIC) {
-            mainState = MainStateType.MANUAL;
+        if (mainState == ModeType.AUTOMATIC) {
+            mainState = ModeType.MANUAL;
         } else {
-            mainState = MainStateType.AUTOMATIC;
+            mainState = ModeType.AUTOMATIC;
         }
     }
 
-    public MainStateType getMode(){
+    public ModeType getMode(){
         return mainState;
     }
 }

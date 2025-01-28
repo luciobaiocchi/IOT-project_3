@@ -1,6 +1,6 @@
 package model;
 
-public enum MainStateType {
+public enum ModeType {
     AUTOMATIC,
     MANUAL;
 }

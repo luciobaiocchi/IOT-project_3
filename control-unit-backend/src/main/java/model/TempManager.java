@@ -9,6 +9,7 @@ public class TempManager {
     private final List<Integer> tempList = new ArrayList<>();
     private TempState tState = TempState.NORMAL;
     private int maxVal;
+    private int freq = Constants.F1;
     long startTime;
     /* from 0 to 100 */
     int openLevel = 0;
@@ -33,16 +34,19 @@ public class TempManager {
     }
 
     public int getLast() {
-        Random random = new Random();
+        //Random random = new Random();
 
         // Generate a random integer between 0 and 99
-        int randomNumber = random.nextInt(40);
+        //int randomNumber = random.nextInt(40);
+        int randomNumber = 50;
         return randomNumber;
         //return tempList.get(tempList.size() - 1); // Correzione: usa size() - 1
     }
 
     public TempState getTempState() {
-        this.updateState();
+        if (this.tState != TempState.ALLARM){
+            this.updateState();
+        }
         return this.tState;
     }
 
@@ -70,15 +74,31 @@ public class TempManager {
         this.startTime = System.currentTimeMillis();
     }
 
-    public boolean checkTimer() {
+    public boolean isOver() {
         return startTime + Constants.DT_millis <= System.currentTimeMillis();
+    }
+
+    public void setFreq(final int freq){
+        this.freq = freq;
+    }
+
+    public int getFreq(){
+        return this.freq;
+    }
+
+    public void startAllarm(){
+        tState = TempState.ALLARM;
     }
 
     private void updateState() {
         int lastTemp = getLast();
-        if (lastTemp > Constants.max_hot) {
+        if (lastTemp > Constants.max_too_hot && tState != TempState.TOO_HOT) {
+            this.startTimer();
             this.tState = TempState.TOO_HOT;
-        } else if (lastTemp > Constants.max_normal) {
+            System.out.println("ok");
+        } else if (lastTemp > Constants.max_too_hot) {
+            this.tState = TempState.TOO_HOT;
+        } else if (lastTemp > Constants.max_hot) {
             this.tState = TempState.HOT;
         } else {
             this.tState = TempState.NORMAL;

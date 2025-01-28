@@ -6,28 +6,21 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.common.template.TemplateEngine;
 import io.vertx.ext.web.handler.BodyHandler;
 import model.Mode;
 import model.TempManager;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.Random;
 
 public class DataService extends AbstractVerticle {
 
     private int port;
-    private static final int MAX_SIZE = 10;
     private TempManager tManager;
 	private Mode mState;
-    private Random random;
 
     public DataService(final int port, final TempManager tManager, final Mode mState) {
 		this.tManager = tManager;
 		this.mState = mState;
         this.port = port;
-        this.random = new Random();
     }
 
     @Override
@@ -54,16 +47,6 @@ public class DataService extends AbstractVerticle {
 			if (res.containsKey("new_mode")){
 				this.mState.changeMode();;
 			}
-            /*float value = generateRandomTemperature(); // Genera una temperatura casuale
-            String place = "random_place";
-            long time = System.currentTimeMillis();
-
-            values.addFirst(new DataPoint(value, time, place));
-            if (values.size() > MAX_SIZE) {
-                values.removeLast();
-            }
-
-            log("New value: " + value + " from " + place + " on " + new Date(time));*/
             response.setStatusCode(200).end();
         }
     }

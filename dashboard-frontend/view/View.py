@@ -37,8 +37,8 @@ class TemperatureDashboard:
         button_frame = tk.Frame(main_container)
         button_frame.pack(pady=10)
         
-        tk.Button(button_frame, text="Aggiorna Dati", command=self.update_data,
-                 font=('Helvetica', 12), padx=15, pady=10).pack(side=tk.LEFT, padx=10)
+        #tk.Button(button_frame, text="Aggiorna Dati", command=self.update_data,
+                 #font=('Helvetica', 12), padx=15, pady=10).pack(side=tk.LEFT, padx=10)
         tk.Button(button_frame, text="Change mode", command=self.change_mode,
                  font=('Helvetica', 12), padx=15, pady=10).pack(side=tk.LEFT, padx=10)
 

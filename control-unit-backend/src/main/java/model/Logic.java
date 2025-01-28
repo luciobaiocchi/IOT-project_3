@@ -3,7 +3,7 @@ package model;
 import model.TempManager;
 import connections.http.DataService;
 import io.vertx.core.Vertx;
-import model.MainStateType;
+import model.ModeType;
 import model.TempState;
 
 public class Logic {
@@ -19,41 +19,42 @@ public class Logic {
     }
 
     public void run(){
-
         while (true) {
-            switch (mode.getMode()) {
-                case AUTOMATIC:
-                    runAuto();
-                    break;
-                case MANUAL:
-                    runMan();
-                    break;
-                default:
-                    break;
+            if (mode.getMode() == ModeType.AUTOMATIC){
+                runAuto();
+            }else{
+                runMan();
             }
         }
     }
 
     private void runAuto(){
+        //System.out.println(tManager.getTempState());
         switch (tManager.getTempState()) {
             /*entry/f=f1
             entry/winClosed()
             do/readFreq()*/
             case NORMAL:
-
-                break;
+                tManager.setFreq(Constants.F1);
+                tManager.setOpening(0);
+            break;
             /*entry/f=f2
             do/winOpenProp()
             do/readFreq()*/
             case HOT:
-                
+                tManager.setFreq(Constants.F2);
             break;
+            
             /*entry/f=
             do/winOpenProp()
             do/readFreq()*/
-
             case TOO_HOT:
-                
+                if(tManager.isOver()){
+                    tManager.startAllarm();
+                }
+            break;
+
+            case ALLARM:
             break;
         
             default:
