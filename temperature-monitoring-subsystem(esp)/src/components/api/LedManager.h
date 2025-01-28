@@ -8,7 +8,6 @@ public:
     LedManager(int pin);
     void turnOn();
     void turnOff();
-    void blink(int delayMs);
 
 private:
     int ledPin;

@@ -11,10 +11,3 @@ void LedManager::turnOn() {
 void LedManager::turnOff() {
     digitalWrite(ledPin, LOW);
 }
-
-void LedManager::blink(int delayMs) {
-    turnOn();
-    delay(delayMs);
-    turnOff();
-    delay(delayMs);
-}
