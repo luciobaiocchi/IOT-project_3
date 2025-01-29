@@ -4,11 +4,11 @@
 SharedState::SharedState()
     : temperature(TS), frequency(FS), wifiNetwork(false), mqttNetwork(false), lastReadTime(0) {}
 
-float SharedState::getTemperature() const {
+int SharedState::getTemperature() const {
     return temperature;
 }
 
-void SharedState::setTemperature(float temp) {
+void SharedState::setTemperature(int temp) {
     temperature = temp;
 }
 

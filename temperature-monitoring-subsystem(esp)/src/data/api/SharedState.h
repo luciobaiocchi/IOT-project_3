@@ -4,14 +4,14 @@
 #include <Arduino.h>
 
 #define FS 1000
-#define TS 0.0
+#define TS 0
 
 class SharedState {
 public:
     SharedState();
 
-    float getTemperature() const;
-    void setTemperature(float temp);
+    int getTemperature() const;
+    void setTemperature(int temp);
 
     int getFrequency() const;
     void setFrequency(int freq);
@@ -26,7 +26,7 @@ public:
     void setLastReadTime(unsigned long time);
 
 private:
-    float temperature;
+    int temperature;
     int frequency;
     bool wifiNetwork;
     bool mqttNetwork;
