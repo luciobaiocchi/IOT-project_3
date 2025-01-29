@@ -1,11 +1,9 @@
 #include "Properties.h"
 
 Properties::Properties(){
-    modality = Mode::MANUAL;
+    modality = Mode::AUTOMATIC;
     position = 0;
-    position = 0; 
-    modeChanged = false; 
-    newPos = 0; 
+    temp = 50;
 }
 
 Mode Properties::getMode(){
@@ -26,24 +24,25 @@ void Properties::setMode(char newmod){
     }else{
         this->modality = Mode::AUTOMATIC;
     }
-    modeChanged = true; 
 }
 
 void Properties::setPosition(int position){
     this->position = position;
 }
 
-bool Properties::isModeChanged(){
-    return modeChanged;
-}
 
-int Properties::getNewPos(){
-    return newPos;
-}
 
 char Properties::getCharMode(){
     if (modality == Mode::MANUAL){
         return 'M';
     }
     return 'A';
+}
+
+int Properties::getTemp(){
+    return temp;
+}
+
+void Properties::setTemp(int temp){
+    this->temp = temp;
 }

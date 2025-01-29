@@ -30,6 +30,7 @@ void SerialCommTask::receive(){
         }
         if (msg->getContent().substring(1, 4).toInt() != prop.getPos()){
             prop.setPosition(msg->getContent().substring(1, 4).toInt());
+            prop.setTemp(msg->getContent().substring(4, 6).toInt());
         }
     }
 }

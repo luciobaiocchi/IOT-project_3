@@ -13,9 +13,7 @@ void ModeTask::init(int period){
 
 void ModeTask::tick(){
     timer.dec();
-    //Serial.println(button->isPressed());
     if (button->isPressed() && timer.isTimeElapsed()){
-        Serial.println("CAMBIO MODE");
         changeMode();
         timer.startTimer(10);
     }

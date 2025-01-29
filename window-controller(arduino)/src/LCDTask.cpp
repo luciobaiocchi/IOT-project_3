@@ -6,8 +6,9 @@ LCDTask::LCDTask(Properties &prop): prop(prop){
     lcd->backlight();
     lcd->clear();
     displayNewMode();
-    currentMode = Mode::AUTOMATIC;
+    currentMode = Mode::MANUAL;
     currentPos = 1;
+    currentTemp = 60;
 }
 
 void LCDTask::init(int period){
@@ -20,9 +21,10 @@ void LCDTask::tick() {
         currentMode = prop.getMode();
         displayNewMode();
     }
-    if (currentPos != prop.getPos()) {
+    if (currentPos != prop.getPos() || prop.getTemp() != currentTemp) {
         currentPos = prop.getPos();
-        displayNewPos();
+        currentTemp = prop.getTemp();
+        displayNewParam();
     }
 
 }
@@ -36,17 +38,22 @@ void LCDTask::displayNewMode() {
         lcd->print("MANUAL");
     }else {
         lcd->print("AUTOMATIC");
-        message = "    T:23";
+        message = "    T:" + currentTemp;
     }
-    displayNewPos();
+    displayNewParam();
     lcd->print(message);
     
 }
 
-void LCDTask::displayNewPos() {
+void LCDTask::displayNewParam() {
     lcd->setCursor(0, 1);
-    lcd->print("Pos:" + (String)currentPos);
+    if (currentMode == Mode::MANUAL){
+        lcd->print("Pos: " + (String)currentPos + "    T:" + currentTemp + "   ");
+    }else{
+        lcd->print("Pos: " + (String)currentPos);
+    }
+    
+    
 }
-
 
 

@@ -12,15 +12,14 @@ public:
     void setMode(Mode modality);
     void setMode(char newmod);
     void setPosition(int position);
-    bool isModeChanged();
-    int getNewPos();
     char getCharMode();
-
+    int getTemp();
+    void setTemp(int temp);
 private:
     Mode modality;
     int position;
-    bool modeChanged;
-    int newPos;
+    int temp;
+
 };
 
 

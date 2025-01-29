@@ -16,10 +16,11 @@ public:
 private:
     Properties& prop;
     void displayNewMode();
-    void displayNewPos();
+    void displayNewParam();
     LiquidCrystal_I2C* lcd;
     int currentPos;
     Mode currentMode;
+    int currentTemp;
 };
 
 
