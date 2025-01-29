@@ -1,0 +1,36 @@
+# Ignora tutte le cartelle chiamate "build"
+build/
+
+# Ignora cartelle "build" in qualsiasi sottodirectory
+**/build/
+
+# Ignora file specifici all'interno delle cartelle build
+**/build/*
+
+# Ignora cartelle di build comuni in vari linguaggi
+# C/C++
+**/cmake-build-*/
+**/out/
+**/bin/
+**/obj/
+
+# Java
+**/target/
+
+# Python
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/*.egg-info/
+**/.pytest_cache/
+
+# Node.js
+**/node_modules/
+
+# Altri file/cartelle generati
+**/.DS_Store
+**/.vscode/
+**/.idea/
+**/*.log
+**/*.tmp
