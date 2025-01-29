@@ -4,9 +4,10 @@ LCDTask::LCDTask(Properties &prop): prop(prop){
     lcd = new LiquidCrystal_I2C(0x27, 16, 2);
     lcd->init();
     lcd->backlight();
+    lcd->clear();
     displayNewMode();
     currentMode = Mode::AUTOMATIC;
-    currentPos = -1;
+    currentPos = 1;
 }
 
 void LCDTask::init(int period){
@@ -27,7 +28,7 @@ void LCDTask::tick() {
 }
 
 void LCDTask::displayNewMode() {
-    String message;
+    String message = "";
     lcd->clear();
     lcd->home();
 

@@ -22,13 +22,15 @@ void setup() {
   Task* gateTask = new GateTask(prop, 5);
   gateTask->init(100);
 
+
   //Task* serialComm = new SerialCommTask(prop);
   //serialComm->init(200);
 
   Task* lcdTask = new LCDTask(prop);
-  lcdTask->init(300);
-  
+  lcdTask->init(150);
 
+
+  
   scheduler.addTask(gateTask);
   scheduler.addTask(modeTask);
   scheduler.addTask(lcdTask);
