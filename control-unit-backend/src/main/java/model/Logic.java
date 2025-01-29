@@ -1,6 +1,7 @@
 package model;
 
 import connections.mqtt.MQTTAgent;
+import connections.serial.SerialLoop;
 import model.TempManager;
 import connections.http.DataService;
 import io.vertx.core.Vertx;
@@ -15,9 +16,11 @@ public class Logic {
     public Logic(){
         Vertx vertx = Vertx.vertx();
         DataService service = new DataService(8080, tManager, mode);
-        MQTTAgent mqttAgent = new MQTTAgent();
-        mqttAgent.start();
+        SerialLoop serialLoop = new SerialLoop(tManager, mode);
+        // MQTTAgent mqttAgent = new MQTTAgent();
+        // mqttAgent.start();
         vertx.deployVerticle(service);
+        serialLoop.run();
     }
 
     public void run(){

@@ -1,6 +1,7 @@
 #ifndef __PROPERTIES__
 #define __PROPERTIES__
 
+#include <Arduino.h>
 #include "Mode.h"
 
 
@@ -14,7 +15,7 @@ public:
     void setPosition(int position);
     char getCharMode();
     int getTemp();
-    void setTemp(int temp);
+    void setTemp(int newTemp);
 private:
     Mode modality;
     int position;
