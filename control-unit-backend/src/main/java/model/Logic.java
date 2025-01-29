@@ -1,70 +1,62 @@
 package model;
 
 import connections.mqtt.MQTTAgent;
-import model.TempManager;
 import connections.http.DataService;
 import io.vertx.core.Vertx;
-import model.ModeType;
-import model.TempState;
 
 public class Logic {
-    /*Contiene stato automatico o manuale */
-    private Mode mode = new Mode();
-    private TempManager tManager = new TempManager(200);
+    private final Mode mode = new Mode();
+    private final TempManager tManager = new TempManager(200);
+    private final Vertx vertx;
+    private final MQTTAgent mqttAgent;
 
-    public Logic(){
-        Vertx vertx = Vertx.vertx();
+    public Logic() {
+        vertx = Vertx.vertx();
+        mqttAgent = new MQTTAgent(tManager);
+
         DataService service = new DataService(8080, tManager, mode);
-        MQTTAgent mqttAgent = new MQTTAgent();
-        mqttAgent.start();
+        
         vertx.deployVerticle(service);
+        vertx.deployVerticle(mqttAgent);
+
+        vertx.setPeriodic(1000, id -> run());
     }
 
-    public void run(){
-        while (true) {
-            if (mode.getMode() == ModeType.AUTOMATIC){
-                runAuto();
-            }else{
-                runMan();
-            }
+    public void run() {
+        if (mode.getMode() == ModeType.AUTOMATIC) {
+            runAuto();
+        } else {
+            runMan();
         }
     }
 
-    private void runAuto(){
-        //System.out.println(tManager.getTempState());
+    private void runAuto() {
+        System.out.println(tManager.getTempState().toString());
         switch (tManager.getTempState()) {
-            /*entry/f=f1
-            entry/winClosed()
-            do/readFreq()*/
             case NORMAL:
                 tManager.setFreq(Constants.F1);
                 tManager.setOpening(0);
-            break;
-            /*entry/f=f2
-            do/winOpenProp()
-            do/readFreq()*/
+                break;
+
             case HOT:
                 tManager.setFreq(Constants.F2);
-            break;
-            
-            /*entry/f=
-            do/winOpenProp()
-            do/readFreq()*/
+                tManager.setOpening(50); 
+                break;
+
             case TOO_HOT:
-                if(tManager.isOver()){
+                tManager.setFreq(Constants.F2);
+                tManager.setOpening(100);
+                if (tManager.isOver()) {
                     tManager.startAllarm();
                 }
-            break;
+                break;
 
             case ALLARM:
-            break;
-        
-            default:
                 break;
         }
+        mqttAgent.sendFrequency(tManager.getFreq());
     }
 
-    private void runMan(){
-        /*Send 'm' */
+    private void runMan() {
     }
 }

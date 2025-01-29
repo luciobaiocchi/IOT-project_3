@@ -64,8 +64,8 @@ void MqttTask::update() {
         lastMsgTime = now;
 
         char msg[MSG_BUFFER_SIZE];
-        String tempMsg = "Temperatura: " + String(sharedState.getTemperature()) + "°C";
-        snprintf(msg, MSG_BUFFER_SIZE, "%s", tempMsg.c_str());
+        int tempMsg = sharedState.getTemperature();
+        snprintf(msg, MSG_BUFFER_SIZE, "%d", tempMsg);
 
         Serial.println(String("Pubblicazione messaggio: ") + msg);
         publishMessage(SEND_TOPIC, msg);

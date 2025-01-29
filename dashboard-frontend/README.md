@@ -32,7 +32,7 @@ source myenv/bin/activate
 ```
 Install requirements
 ```bash
-pip install -r requirements.txt
+python -m venv myenv
 ```
 Close virtual environment
 ```bash

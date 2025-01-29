@@ -3,7 +3,6 @@ package model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 public class TempManager {
     private final List<Integer> tempList = new ArrayList<>();
@@ -34,13 +33,7 @@ public class TempManager {
     }
 
     public int getLast() {
-        Random random = new Random();
-
-        // Generate a random integer between 0 and 99
-        int randomNumber = random.nextInt(40);
-        randomNumber = 50;
-        return randomNumber;
-        //return tempList.get(tempList.size() - 1); // Correzione: usa size() - 1
+        return tempList.get(tempList.size() - 1); // Correzione: usa size() - 1
     }
 
     public TempState getTempState() {
