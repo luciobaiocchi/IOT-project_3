@@ -8,6 +8,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import model.Mode;
+import model.TempState;
 import model.TempManager;
 
 
@@ -45,8 +46,10 @@ public class DataService extends AbstractVerticle {
             sendError(400, response);
         } else {
 			if (res.containsKey("new_mode")){
-				this.mState.changeMode();;
-			}
+				this.mState.changeMode();
+			}else if (res.containsKey("stop_alarm" ) && tManager.getTempState() == TempState.ALLARM){
+                tManager.resetAllarm();
+            }
             response.setStatusCode(200).end();
         }
     }

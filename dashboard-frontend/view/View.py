@@ -37,10 +37,12 @@ class TemperatureDashboard:
         button_frame = tk.Frame(main_container)
         button_frame.pack(pady=10)
         
-        #tk.Button(button_frame, text="Aggiorna Dati", command=self.update_data,
-                 #font=('Helvetica', 12), padx=15, pady=10).pack(side=tk.LEFT, padx=10)
         tk.Button(button_frame, text="Change mode", command=self.change_mode,
                  font=('Helvetica', 12), padx=15, pady=10).pack(side=tk.LEFT, padx=10)
+
+        tk.Button(button_frame, text="Stop Allarm", command=self.stop_alarm,
+                 font=('Helvetica', 12), padx=15, pady=10).pack(side=tk.LEFT, padx=10)
+
 
     def update_data(self):
         async def async_update():
@@ -59,12 +61,14 @@ class TemperatureDashboard:
                     self.opening_level = latest['opn']
                     self.mode = latest['main_state']
                     
-                    
                     # Filtra i dati degli ultimi 30 secondi
                     current_time = self.elapsed_times[-1]
                     last_30_seconds = [t for t in self.elapsed_times if t >= current_time - 30]
                     last_30_temps = self.temperatures[-len(last_30_seconds):]
                     last_30_status = self.status_history[-len(last_30_seconds):]
+                    
+                    # Calcola valore medio
+                    avg_temp = sum(last_30_temps) / len(last_30_temps) if last_30_temps else 0
                     
                     # Aggiorna grafico con dati degli ultimi 30 secondi
                     self.root.after(0, lambda: self._update_plot(
@@ -72,6 +76,7 @@ class TemperatureDashboard:
                         last_30_temps,
                         max(last_30_temps) if last_30_temps else 0,
                         min(last_30_temps) if last_30_temps else 0,
+                        avg_temp,
                         last_30_status[-1] if last_30_status else "N/A",
                         self.opening_level,
                         self.mode
@@ -80,18 +85,26 @@ class TemperatureDashboard:
                     print(f"Errore: {e}")
         asyncio.run_coroutine_threadsafe(async_update(), self.loop)
 
-    def _update_plot(self, times, temps, current_max, current_min, current_status, opening_level, mode):
+    def _update_plot(self, times, temps, current_max, current_min, avg_temp, current_status, opening_level, mode):
         self.ax.clear()
         
         # Plot dati principali
-        self.ax.plot(times, temps, marker='o', linestyle='-', color='#2c7bb6')
+        self.ax.plot(times, temps, marker='o', linestyle='-', color='#2c7bb6', label='Temperatura')
         
         # Linee max/min
         self.ax.axhline(current_max, color='#d7191c', linestyle='--', label=f'Max: {current_max}°C')
         self.ax.axhline(current_min, color='#1a9641', linestyle='--', label=f'Min: {current_min}°C')
         
+        # Linea media
+        self.ax.axhline(avg_temp, color='#fdae61', linestyle='-.', label=f'Avg: {avg_temp:.2f}°C')
+        
         # Informazioni a destra
-        textstr = f"Max: {current_max}°C\nMin: {current_min}°C\nStatus: {current_status}\nOpening Level: {opening_level}\nMode: {mode}"
+        textstr = (f"Max: {current_max}°C\n"
+                   f"Min: {current_min}°C\n"
+                   f"Avg: {avg_temp:.2f}°C\n"
+                   f"Status: {current_status}\n"
+                   f"Opening Level: {opening_level}\n"
+                   f"Mode: {mode}")
         self.ax.text(
             1.05, 0.5, textstr, 
             transform=self.ax.transAxes,
@@ -117,4 +130,10 @@ class TemperatureDashboard:
         async def async_post_mode():
             async with ClientSession() as session:
                 await self.connection.post_mode(session, "new_mod")
+        asyncio.run_coroutine_threadsafe(async_post_mode(), self.loop)
+        
+    def stop_alarm(self):
+        async def async_post_mode():
+            async with ClientSession() as session:
+                await self.connection.post_alarm(session, "stop_alarm")
         asyncio.run_coroutine_threadsafe(async_post_mode(), self.loop)

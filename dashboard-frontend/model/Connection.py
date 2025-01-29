@@ -44,6 +44,16 @@ class Connection:
         async with session.post(url, json={"new_mode": mode}) as response:
             print(f"Posting mode - Received response with status code: {response.status}")
             return await response.json()
+    
+    async def post_alarm(self, session: ClientSession, mode: str):
+        """
+        Invia una nuova modalità al server.
+        """
+        url = f"http://{self.host}:{self.port}/api/data"
+        print(f"Posting new mode: {mode}...")
+        async with session.post(url, json={"stop_alarm": mode}) as response:
+            print(f"Posting mode - Received response with status code: {response.status}")
+            return await response.json()
 
     async def run(self):
         """

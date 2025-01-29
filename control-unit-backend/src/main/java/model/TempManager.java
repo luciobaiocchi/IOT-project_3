@@ -34,11 +34,11 @@ public class TempManager {
     }
 
     public int getLast() {
-        //Random random = new Random();
+        Random random = new Random();
 
         // Generate a random integer between 0 and 99
-        //int randomNumber = random.nextInt(40);
-        int randomNumber = 50;
+        int randomNumber = random.nextInt(40);
+        randomNumber = 50;
         return randomNumber;
         //return tempList.get(tempList.size() - 1); // Correzione: usa size() - 1
     }
@@ -62,28 +62,32 @@ public class TempManager {
         tempList.add(temp);
     }
 
-    public void setOpening(final int opening){
-        this.openLevel = opening;
-    }
-
     public int getOpening(){
         return openLevel;
     }
 
+    public int getFreq(){
+        return this.freq;
+    }
+    
     public void startTimer() {
         this.startTime = System.currentTimeMillis();
     }
-
+    
     public boolean isOver() {
         return startTime + Constants.DT_millis <= System.currentTimeMillis();
+    }
+    
+    public void setOpening(final int opening){
+        this.openLevel = opening;
     }
 
     public void setFreq(final int freq){
         this.freq = freq;
     }
 
-    public int getFreq(){
-        return this.freq;
+    public void resetAllarm(){
+        this.tState = TempState.NORMAL;
     }
 
     public void startAllarm(){
@@ -93,9 +97,9 @@ public class TempManager {
     private void updateState() {
         int lastTemp = getLast();
         if (lastTemp > Constants.max_too_hot && tState != TempState.TOO_HOT) {
+            System.out.println("START TIMER");
             this.startTimer();
             this.tState = TempState.TOO_HOT;
-            System.out.println("ok");
         } else if (lastTemp > Constants.max_too_hot) {
             this.tState = TempState.TOO_HOT;
         } else if (lastTemp > Constants.max_hot) {

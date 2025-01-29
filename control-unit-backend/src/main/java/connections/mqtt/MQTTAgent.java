@@ -24,8 +24,9 @@ import java.util.Map;
 public class MQTTAgent extends AbstractVerticle {
 	
 	private static final String BROKER_ADDRESS = "broker.mqtt-dashboard.com";
-	private static final String TOPIC_NAME = "esiot-2024";
-	
+	private static final String TOPIC_SUBSCRIBE = "temperature";
+	private static final String TOPIC_SEND = "frequency";
+
 	public MQTTAgent() {
 	}
 
@@ -43,10 +44,10 @@ public class MQTTAgent extends AbstractVerticle {
 			  System.out.println("Content(as string) of the message: " + s.payload().toString());
 			  System.out.println("QoS: " + s.qosLevel());
 			})
-			.subscribe(TOPIC_NAME, 2);		
+			.subscribe(TOPIC_SUBSCRIBE, 2);
 
 			log("publishing a msg");
-			client.publish(TOPIC_NAME,
+			client.publish(TOPIC_SEND,
 				  Buffer.buffer("hello"),
 				  MqttQoS.AT_LEAST_ONCE,
 				  false,
