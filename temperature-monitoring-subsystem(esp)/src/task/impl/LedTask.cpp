@@ -7,7 +7,7 @@ LedTask::LedTask(int greenPin, int redPin, SharedState& state)
 }
 
 void LedTask::update() {
-    if (sharedState.isMqttNetworkConnected()) {
+    if (sharedState.isMqttNetworkConnected() && sharedState.isWifiNetworkConnected()) {
         digitalWrite(greenPin, HIGH);
         digitalWrite(redPin, LOW);
     } else {

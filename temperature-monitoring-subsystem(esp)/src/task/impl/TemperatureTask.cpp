@@ -7,11 +7,14 @@ TemperatureTask::TemperatureTask(int sensorPin, SharedState& state)
 
 void TemperatureTask::update() {
     unsigned long currentTime = millis();
-    if (currentTime - sharedState.getLastReadTime() >= sharedState.getReadFrequency()) {
+    if (currentTime - sharedState.getLastReadTime() >= sharedState.getFrequency()) {
         int rawValue = analogRead(sensorPin);
-        float voltage = rawValue * (3.3 / 4095.0);
-        sharedState.setTemperature((voltage - 0.5) * 100);
-
+        
+        float temperature = map(rawValue, 0, 4095, -30.0, 50.0);
+        
+        sharedState.setTemperature(temperature);
         sharedState.setLastReadTime(currentTime);
+
+        Serial.println(sharedState.getTemperature());
     }
 }

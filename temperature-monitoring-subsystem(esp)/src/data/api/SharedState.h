@@ -13,8 +13,8 @@ public:
     float getTemperature() const;
     void setTemperature(float temp);
 
-    int getReadFrequency() const;
-    void setReadFrequency(int freq);
+    int getFrequency() const;
+    void setFrequency(int freq);
 
     bool isWifiNetworkConnected() const;
     void setWifiNetworkConnected(bool status);
@@ -27,7 +27,7 @@ public:
 
 private:
     float temperature;
-    int readFrequency;
+    int frequency;
     bool wifiNetwork;
     bool mqttNetwork;
     unsigned long lastReadTime;

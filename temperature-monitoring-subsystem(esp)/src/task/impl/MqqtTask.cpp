@@ -24,6 +24,10 @@ void MqttTask::connectToWiFi() {
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);
         Serial.print(".");
+        delay(1000);
+        Serial.print(".");
+        delay(1000);
+        Serial.println(".");
     }
 
     sharedState.setWifiNetworkConnected(true);
@@ -42,7 +46,7 @@ void MqttTask::connectToMqtt() {
         } else {
             Serial.print("Connessione fallita, rc=");
             Serial.print(mqttClient.state());
-            Serial.println(". Riprovo in 5 secondi...");
+            Serial.println(". Riprovo tra 5 secondi...");
             delay(5000);
         }
     }
@@ -51,7 +55,6 @@ void MqttTask::connectToMqtt() {
 void MqttTask::update() {
     if (WiFi.status() != WL_CONNECTED) {
         sharedState.setWifiNetworkConnected(false);
-        Serial.println("WiFi disconnesso! Riconnessione...");
         connectToWiFi();
     }
 

@@ -15,4 +15,4 @@ private:
     SharedState& sharedState;
 };
 
-#endif // LEDTASK_H
+#endif
