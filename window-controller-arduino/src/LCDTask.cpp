@@ -21,9 +21,9 @@ void LCDTask::tick() {
         currentMode = prop.getMode();
         displayNewMode();
     }
-    if (currentPos != prop.getPos() || prop.getTemp() != currentTemp) {
-        currentPos = prop.getPos();
+    if (prop.getTemp() != currentTemp || prop.getPos() != currentPos) {
         currentTemp = prop.getTemp();
+        currentPos = prop.getPos();
         displayNewParam();
     }
 
@@ -38,7 +38,6 @@ void LCDTask::displayNewMode() {
         lcd->print("MANUAL");
     }else {
         lcd->print("AUTOMATIC");
-        message = "    T:" + currentTemp;
     }
     displayNewParam();
     lcd->print(message);
@@ -48,11 +47,10 @@ void LCDTask::displayNewMode() {
 void LCDTask::displayNewParam() {
     lcd->setCursor(0, 1);
     if (currentMode == Mode::MANUAL){
-        lcd->print("Pos: " + (String)currentPos + "    T:" + currentTemp + "   ");
+        lcd->print("Pos: " + (String)currentPos + "    T: " + (String)currentTemp + " ");
     }else{
         lcd->print("Pos: " + (String)currentPos);
     }
-    
     
 }
 

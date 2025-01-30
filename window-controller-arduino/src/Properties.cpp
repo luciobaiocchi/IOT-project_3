@@ -43,6 +43,6 @@ int Properties::getTemp(){
     return temp;
 }
 
-void Properties::setTemp(int temp){
-    this->temp = temp;
+void Properties::setTemp(int newTemp){
+    this->temp = newTemp;
 }
