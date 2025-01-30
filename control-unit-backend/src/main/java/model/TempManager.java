@@ -15,9 +15,7 @@ public class TempManager {
 
     public TempManager(final int max) {
         this.maxVal = max;
-        tempList.add(2);
-        tempList.add(14);
-        tempList.add(25);
+        tempList.add(100);
     }
 
     public List<Integer> getHistory() {
@@ -89,13 +87,13 @@ public class TempManager {
 
     private void updateState() {
         int lastTemp = getLast();
-        if (lastTemp > Constants.max_too_hot && tState != TempState.TOO_HOT) {
+        if (lastTemp > Constants.T2 && tState != TempState.TOO_HOT) {
             System.out.println("START TIMER");
             this.startTimer();
             this.tState = TempState.TOO_HOT;
-        } else if (lastTemp > Constants.max_too_hot) {
+        } else if (lastTemp > Constants.T2) {
             this.tState = TempState.TOO_HOT;
-        } else if (lastTemp > Constants.max_hot) {
+        } else if (lastTemp > Constants.T1) {
             this.tState = TempState.HOT;
         } else {
             this.tState = TempState.NORMAL;

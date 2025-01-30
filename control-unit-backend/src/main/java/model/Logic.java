@@ -1,10 +1,11 @@
 package model;
 
 import connections.mqtt.MQTTAgent;
+import connections.serial.SerialLoop;
 import connections.http.DataService;
 import io.vertx.core.Vertx;
 
-public class Logic {
+public class Logic extends Thread{
     private final Mode mode = new Mode();
     private final TempManager tManager = new TempManager(200);
     private final Vertx vertx;
@@ -15,7 +16,8 @@ public class Logic {
         mqttAgent = new MQTTAgent(tManager);
 
         DataService service = new DataService(8080, tManager, mode);
-        
+        SerialLoop serial = new SerialLoop(tManager, mode);
+        serial.start();
         vertx.deployVerticle(service);
         vertx.deployVerticle(mqttAgent);
 
@@ -31,27 +33,38 @@ public class Logic {
     }
 
     private void runAuto() {
-        System.out.println(tManager.getTempState().toString());
+        //System.out.println(tManager.getTempState().toString());
         switch (tManager.getTempState()) {
+            /*entry/f=f1
+            entry/winClosed()
+            do/readFreq()*/
             case NORMAL:
                 tManager.setFreq(Constants.F1);
                 tManager.setOpening(0);
-                break;
-
+            break;
+            /*entry/f=f2
+            do/winOpenProp()
+            do/readFreq()*/
             case HOT:
+                tManager.setOpening(50);
                 tManager.setFreq(Constants.F2);
-                tManager.setOpening(50); 
-                break;
-
+            break;
+            
+            /*entry/f=
+            do/winOpenProp()
+            do/readFreq()*/
             case TOO_HOT:
                 tManager.setFreq(Constants.F2);
                 tManager.setOpening(100);
-                if (tManager.isOver()) {
+                if(tManager.isOver()){
                     tManager.startAllarm();
                 }
-                break;
+            break;
 
             case ALLARM:
+            break;
+        
+            default:
                 break;
         }
         mqttAgent.sendFrequency(tManager.getFreq());
