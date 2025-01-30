@@ -17,6 +17,7 @@ python -m venv myenv
 ```
 3. Su alcuni sistemi, potrebbe essere necessario usare python3 invece di python:
 
+L'ambiente che usiamo si chiama iot
 ```bash
 python3 -m venv myenv
 ```
@@ -38,3 +39,9 @@ Close virtual environment
 ```bash
 deactivate
 ```
+
+Installare i pacchetti 
+```bash
+python3 -m pip install -r requirements.txt
+```
+
