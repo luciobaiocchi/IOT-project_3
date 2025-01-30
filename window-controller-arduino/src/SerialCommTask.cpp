@@ -37,22 +37,24 @@ void SerialCommTask::receive(){
                 temp = -temp;
             }
             prop.setTemp(temp);
-        }else {
+        }else if(msg->getContent().charAt(0) == 'A') {
             prop.setMode(Mode::AUTOMATIC);
-            prop.setPosition(msg->getContent().substring(1, 3).toInt());
+            prop.setPosition(msg->getContent().substring(1, 4).toInt());
         }
-        
+        delete msg;    
     }
+    
 }
 
 void SerialCommTask::send(){
     currentState = State::RECEIVE;
-    String message;
-    if (prop.getMode() == Mode::MANUAL){
-        message = "M" + (String)prop.getPos();
-    } else{
-        message = "A";
+    char buffer[5];
+
+    if (prop.getMode() == Mode::MANUAL) {
+        snprintf(buffer, sizeof(buffer), "M%03d", prop.getPos()); 
+    } else {
+        strcpy(buffer, "A"); 
     }
     
-    MsgService.sendMsg(message);
+    MsgService.sendMsg(buffer);
 }

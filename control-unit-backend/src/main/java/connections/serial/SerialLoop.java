@@ -88,9 +88,8 @@ public class SerialLoop extends Thread{
 
         if (mode.getMode() == ModeType.AUTOMATIC){
             msg.append("A");
-            // Formatta l'apertura con zero padding
             int opening = tManager.getOpening();
-            opening = 1;
+            opening = 50;
             if (opening < 100 && opening > 9) {
                 msg.append("0").append(opening);
             } else if (opening < 10) {
