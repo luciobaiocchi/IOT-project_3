@@ -24,10 +24,11 @@ private:
     WiFiClient wifiClient;
     PubSubClient mqttClient;
     unsigned long lastMsgTime;
+    int receivedFrequency;
 
     void connectToWiFi();
     void connectToMqtt();
-    static void onMessageReceived(char* topic, byte* payload, unsigned int length);
+    void onMessageReceived(char* topic, byte* payload, unsigned int length);  // Ora è metodo di istanza
 };
 
 #endif
