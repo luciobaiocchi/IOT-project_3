@@ -13,6 +13,7 @@ public:
     void setMode(Mode modality);
     void setMode(char newmod);
     void setPosition(int position);
+    void setPercPosition(int position);
     char getCharMode();
     int getTemp();
     void setTemp(int newTemp);

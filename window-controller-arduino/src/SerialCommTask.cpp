@@ -39,7 +39,7 @@ void SerialCommTask::receive(){
             prop.setTemp(temp);
         }else if(msg->getContent().charAt(0) == 'A') {
             prop.setMode(Mode::AUTOMATIC);
-            prop.setPosition(msg->getContent().substring(1, 4).toInt());
+            prop.setPercPosition(msg->getContent().substring(1, 4).toInt());
         }
         delete msg;    
     }

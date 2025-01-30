@@ -30,7 +30,9 @@ void Properties::setPosition(int position){
     this->position = position;
 }
 
-
+void Properties::setPercPosition(int position){
+    this->position = map(position, 0, 100, 0, 90);
+}
 
 char Properties::getCharMode(){
     if (modality == Mode::MANUAL){
