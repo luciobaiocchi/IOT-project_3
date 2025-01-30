@@ -9,7 +9,11 @@ void SerialCommTask::init(int period){
     Task::init(period);   
 }
 
-/*  Messaggio --> M0000 */
+/*  Send Messaggi --> M000 --> livello apertura
+                    A
+                    
+    Receive ---> M+00  --> temp
+                 A000  --> livello apertura */
 void SerialCommTask::tick(){
     switch (currentState){
         case State::SEND:
@@ -25,17 +29,32 @@ void SerialCommTask::receive(){
     if (MsgService.isMsgAvailable()) {
         Msg* msg = MsgService.receiveMsg(); 
         currentState = State::SEND;
-        if (msg->getContent().charAt(0) != prop.getCharMode()){
-            prop.setMode(msg->getContent().charAt(0));
-        }
-        if (msg->getContent().substring(1, 4).toInt() != prop.getPos()){
+
+        if (msg->getContent().charAt(0) == 'M'){
+            prop.setMode(Mode::MANUAL);
+            int temp = msg->getContent().substring(2, 4).toInt();
+            if (msg->getContent().charAt(1) == '-') {
+                temp = -temp;
+            }
+            prop.setTemp(temp);
+        }else if(msg->getContent().charAt(0) == 'A') {
+            prop.setMode(Mode::AUTOMATIC);
             prop.setPosition(msg->getContent().substring(1, 4).toInt());
-            prop.setTemp(msg->getContent().substring(4, 6).toInt());
         }
+        delete msg;    
     }
+    
 }
 
 void SerialCommTask::send(){
-    String message = "" + prop.getCharMode() + prop.getPos();
-    MsgService.sendMsg(message);
+    currentState = State::RECEIVE;
+    char buffer[5];
+
+    if (prop.getMode() == Mode::MANUAL) {
+        snprintf(buffer, sizeof(buffer), "M%03d", prop.getPos()); 
+    } else {
+        strcpy(buffer, "A"); 
+    }
+    
+    MsgService.sendMsg(buffer);
 }
