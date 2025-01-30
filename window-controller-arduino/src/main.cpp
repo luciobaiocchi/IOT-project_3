@@ -1,18 +1,42 @@
 #include <Arduino.h>
+#include "Scheduler.h"
+#include "Properties.h"
+#include "ModeTask.h"
+#include "GateTask.h"
+#include "SerialCommTask.h"
+#include "LCDTask.h"
 
-// put function declarations here:
-int myFunction(int, int);
+Scheduler scheduler;
+
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  scheduler.init(50);
+  Properties prop = Properties();
+
+  Serial.begin(9600);
+
+
+  Task* modeTask = new ModeTask(13, prop);
+  modeTask->init(200);
+
+  Task* gateTask = new GateTask(prop, 5);
+  gateTask->init(100);
+
+
+  //Task* serialComm = new SerialCommTask(prop);
+  //serialComm->init(200);
+
+  Task* lcdTask = new LCDTask(prop);
+  lcdTask->init(150);
+
+
+  
+  scheduler.addTask(gateTask);
+  scheduler.addTask(modeTask);
+  scheduler.addTask(lcdTask);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  scheduler.schedule();
 }
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}
