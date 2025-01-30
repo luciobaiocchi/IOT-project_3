@@ -48,3 +48,7 @@ int Properties::getTemp(){
 void Properties::setTemp(int newTemp){
     this->temp = newTemp;
 }
+
+int Properties::getPercPos(){
+    return map(position, 0, 90, 0, 100);
+}

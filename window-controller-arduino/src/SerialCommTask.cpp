@@ -51,7 +51,7 @@ void SerialCommTask::send(){
     char buffer[5];
 
     if (prop.getMode() == Mode::MANUAL) {
-        snprintf(buffer, sizeof(buffer), "M%03d", prop.getPos()); 
+        snprintf(buffer, sizeof(buffer), "M%03d", prop.getPercPos()); 
     } else {
         strcpy(buffer, "A"); 
     }

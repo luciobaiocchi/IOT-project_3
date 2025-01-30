@@ -17,6 +17,7 @@ public:
     char getCharMode();
     int getTemp();
     void setTemp(int newTemp);
+    int getPercPos();
 private:
     Mode modality;
     int position;
