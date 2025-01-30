@@ -17,6 +17,14 @@ build/
 # Java
 **/target/
 
+# Gradle
+.gradle/
+**/.gradle/
+gradle-app.setting
+gradle.properties
+gradlew
+gradlew.bat
+
 # Python
 **/__pycache__/
 **/*.pyc
