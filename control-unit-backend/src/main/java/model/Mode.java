@@ -3,8 +3,7 @@ package model;
 public class Mode {
     private ModeType mainState = ModeType.AUTOMATIC;
 
-    public void MainState(){
-
+    public void Mode(){
     }
 
     public void changeMode(){
