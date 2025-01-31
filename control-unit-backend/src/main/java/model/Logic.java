@@ -18,9 +18,9 @@ public class Logic extends Thread{
         DataService service = new DataService(8080, tManager, mode);
         SerialLoop serial = new SerialLoop(tManager, mode);
         serial.start();
+        
         vertx.deployVerticle(service);
-        vertx.deployVerticle(mqttAgent);
-
+        vertx.deployVerticle(mqttAgent)
         vertx.setPeriodic(1000, id -> run());
     }
 
