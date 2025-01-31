@@ -7,12 +7,15 @@
 
 class TemperatureTask {
 public:
-    TemperatureTask(int sensorPin, SharedState& state);
+    TemperatureTask(int sensorPin, 
+                    SharedState& state, 
+                    SemaphoreHandle_t& sharedStateMutex);
     void update();
 
 private:
     int sensorPin;
     SharedState& sharedState;
+    SemaphoreHandle_t& sharedStateMutex;
 };
 
 #endif

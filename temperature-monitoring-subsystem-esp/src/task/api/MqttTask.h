@@ -10,7 +10,11 @@
 
 class MqttTask {
 public:
-    MqttTask(const char* mqttServer, int mqttPort, const char* clientId, SharedState& sharedState);
+    MqttTask(const char* mqttServer, 
+            int mqttPort, 
+            const char* clientId, 
+            SharedState& sharedState,
+            SemaphoreHandle_t& sharedStateMutex);
 
     void update();
     void publishMessage(const char* topic, const char* message);
@@ -20,6 +24,7 @@ private:
     int mqttPort;
     const char* clientId;
     SharedState& sharedState;
+    SemaphoreHandle_t& sharedStateMutex;
 
     WiFiClient wifiClient;
     PubSubClient mqttClient;
@@ -28,7 +33,7 @@ private:
 
     void connectToWiFi();
     void connectToMqtt();
-    void onMessageReceived(char* topic, byte* payload, unsigned int length);  // Ora è metodo di istanza
+    void onMessageReceived(char* topic, byte* payload, unsigned int length);
 };
 
 #endif
