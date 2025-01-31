@@ -86,41 +86,46 @@ class TemperatureDashboard:
         asyncio.run_coroutine_threadsafe(async_update(), self.loop)
 
     def _update_plot(self, times, temps, current_max, current_min, avg_temp, current_status, opening_level, mode):
-        self.ax.clear()
-        
-        # Plot dati principali
-        self.ax.plot(times, temps, marker='o', linestyle='-', color='#2c7bb6', label='Temperatura')
-        
-        # Linee max/min
-        self.ax.axhline(current_max, color='#d7191c', linestyle='--', label=f'Max: {current_max}°C')
-        self.ax.axhline(current_min, color='#1a9641', linestyle='--', label=f'Min: {current_min}°C')
-        
-        # Linea media
-        self.ax.axhline(avg_temp, color='#fdae61', linestyle='-.', label=f'Avg: {avg_temp:.2f}°C')
-        
-        # Informazioni a destra
-        textstr = (f"Max: {current_max}°C\n"
-                   f"Min: {current_min}°C\n"
-                   f"Avg: {avg_temp:.2f}°C\n"
-                   f"Status: {current_status}\n"
-                   f"Opening Level: {opening_level}\n"
-                   f"Mode: {mode}")
-        self.ax.text(
-            1.05, 0.5, textstr, 
-            transform=self.ax.transAxes,
-            va='center',
-            bbox=dict(facecolor='white', alpha=0.5)
-        )
-        
-        # Formattazione assi
-        self.ax.set_xlabel("Tempo trascorso (s)")
-        self.ax.set_ylabel("Temperatura (°C)")
-        self.ax.set_title("Andamento Temperatura (Ultimi 30 secondi)")
-        self.ax.grid(True, alpha=0.3)
-        self.ax.legend(loc='upper left')
-        
-        self.figure.tight_layout()
-        self.canvas.draw()
+    self.ax.clear()
+
+    # Ultimo valore
+    latest_temp = temps[-1] if temps else "N/A"
+
+    # Plot dati principali
+    self.ax.plot(times, temps, marker='o', linestyle='-', color='#2c7bb6', label='Temperatura')
+
+    # Linee max/min
+    self.ax.axhline(current_max, color='#d7191c', linestyle='--', label=f'Max: {current_max}°C')
+    self.ax.axhline(current_min, color='#1a9641', linestyle='--', label=f'Min: {current_min}°C')
+
+    # Linea media
+    self.ax.axhline(avg_temp, color='#fdae61', linestyle='-.', label=f'Avg: {avg_temp:.2f}°C')
+
+    # Informazioni a destra
+    textstr = (f"Latest: {latest_temp}°C\n"
+               f"Max: {current_max}°C\n"
+               f"Min: {current_min}°C\n"
+               f"Avg: {avg_temp:.2f}°C\n"
+               f"Status: {current_status}\n"
+               f"Opening Level: {opening_level}\n"
+               f"Mode: {mode}")
+    self.ax.text(
+        1.05, 0.5, textstr, 
+        transform=self.ax.transAxes,
+        va='center',
+        bbox=dict(facecolor='white', alpha=0.5)
+    )
+
+    # Formattazione assi
+    self.ax.set_xlabel("Tempo trascorso (s)")
+    self.ax.set_ylabel("Temperatura (°C)")
+    self.ax.set_title("Andamento Temperatura (Ultimi 30 secondi)")
+    self.ax.grid(True, alpha=0.3)
+    self.ax.legend(loc='upper left')
+
+    self.figure.tight_layout()
+    self.canvas.draw()
+
 
     def schedule_auto_update(self):
         self.root.after(500, self.schedule_auto_update)
