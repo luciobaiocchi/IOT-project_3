@@ -20,7 +20,7 @@ public class Logic extends Thread{
         serial.start();
         
         vertx.deployVerticle(service);
-        vertx.deployVerticle(mqttAgent)
+        vertx.deployVerticle(mqttAgent);
         vertx.setPeriodic(1000, id -> run());
     }
 
@@ -81,15 +81,15 @@ public class Logic extends Thread{
      * @return Un valore compreso tra 1 e 99 proporzionale a t.
      */
 
-    private static int mapTemperature(final int t) {
+    private static int mapTemperature(int t) {
         if (t < Constants.T1) {
-            t = T1;
+            t = Constants.T1;
         } else if (t > Constants.T2) {
-            t = T2;
+            t = Constants.T2;
         }
 
         // Calcola il valore proporzionale
-        double proportion = (double) (t - T1) / (T2 - T1); // Proporzione tra 0 e 1
+        double proportion = (double) (t - Constants.T1) / (Constants.T2 - Constants.T1); // Proporzione tra 0 e 1
         int mappedValue = (int) (1 + proportion * 98); // Scala tra 1 e 99
 
         return mappedValue;
