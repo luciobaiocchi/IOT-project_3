@@ -46,7 +46,7 @@ public class Logic extends Thread{
             do/winOpenProp()
             do/readFreq()*/
             case HOT:
-                tManager.setOpening(50);
+                tManager.setOpening(mapTemperature(tManager.getLast()));
                 tManager.setFreq(Constants.F2);
             break;
             
@@ -71,5 +71,27 @@ public class Logic extends Thread{
     }
 
     private void runMan() {
+    }
+    /**
+     * Metodo per mappare una temperatura t in un valore proporzionale tra 1 e 99.
+     *
+     * @param t  La temperatura da mappare.
+     * @param T1 Il valore minimo della temperatura.
+     * @param T2 Il valore massimo della temperatura.
+     * @return Un valore compreso tra 1 e 99 proporzionale a t.
+     */
+
+    private static int mapTemperature(final int t) {
+        if (t < Constants.T1) {
+            t = T1;
+        } else if (t > Constants.T2) {
+            t = T2;
+        }
+
+        // Calcola il valore proporzionale
+        double proportion = (double) (t - T1) / (T2 - T1); // Proporzione tra 0 e 1
+        int mappedValue = (int) (1 + proportion * 98); // Scala tra 1 e 99
+
+        return mappedValue;
     }
 }
