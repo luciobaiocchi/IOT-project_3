@@ -7,12 +7,17 @@
 
 class LedTask {
 public:
-    LedTask(int greenPin, int redPin, SharedState& state);
+    LedTask(int greenPin, 
+            int redPin, 
+            SharedState& state, 
+            SemaphoreHandle_t& sharedStateMutex);
+            
     void update();
 
 private:
     int greenPin, redPin;
     SharedState& sharedState;
+    SemaphoreHandle_t& sharedStateMutex;
 };
 
 #endif

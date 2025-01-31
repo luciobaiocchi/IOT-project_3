@@ -5,8 +5,8 @@ TemperatureSensor::TemperatureSensor(int pin) : sensorPin(pin) {
 }
 
 int TemperatureSensor::readTemperature() {
-    int rawValue = analogRead(sensorPin); // Lettura grezza dal sensore
-    int voltage = rawValue * (3.3 / 4095.0); // Conversione a tensione (esempio per ESP32)
-    int temperature = (voltage - 0.5) * 100; // Conversione in gradi Celsius
+    int rawValue = analogRead(sensorPin);
+    int voltage = rawValue * (3.3 / 4095.0);
+    int temperature = (voltage - 0.5) * 100; 
     return temperature;
 }

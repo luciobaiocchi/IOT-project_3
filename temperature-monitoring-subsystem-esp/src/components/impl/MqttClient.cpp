@@ -13,7 +13,7 @@ void MqttClient::connect() {
         } else {
             Serial.print("MQTT Connection failed, rc=");
             Serial.println(client.state());
-            delay(5000);
+            vTaskDelay(pdMS_TO_TICKS(5000));
         }
     }
 }
@@ -31,11 +31,7 @@ void MqttClient::loop() {
 }
 
 void MqttClient::callback(char* topic, byte* payload, unsigned int length) {
-    Serial.print("Message arrived on topic: ");
-    Serial.println(topic);
-    Serial.print("Message: ");
     for (unsigned int i = 0; i < length; i++) {
         Serial.print((char)payload[i]);
     }
-    Serial.println();
 }
