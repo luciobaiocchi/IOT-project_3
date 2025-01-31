@@ -4,7 +4,8 @@ LedTask::LedTask(int greenPin,
                 int redPin, 
                 SharedState& state, 
                 SemaphoreHandle_t& sharedStateMutex)
-    : greenPin(greenPin), 
+    : state(NOT_CONNECT),
+    greenPin(greenPin), 
     redPin(redPin), 
     sharedState(state), 
     sharedStateMutex(sharedStateMutex) {
@@ -18,12 +19,22 @@ void LedTask::update() {
     }
 
     if (sharedState.isMqttNetworkConnected() && sharedState.isWifiNetworkConnected()) {
-        digitalWrite(greenPin, HIGH);
-        digitalWrite(redPin, LOW);
+        state = CONNECT;
     } else {
-        digitalWrite(greenPin, LOW);
-        digitalWrite(redPin, HIGH);
+        state = NOT_CONNECT;
     }
 
     xSemaphoreGive(sharedStateMutex);
+
+    switch (state) {
+        case CONNECT:
+            digitalWrite(greenPin, HIGH);
+            digitalWrite(redPin, LOW);
+            break;
+
+        case NOT_CONNECT:
+            digitalWrite(greenPin, LOW);
+            digitalWrite(redPin, HIGH);
+            break;
+    }
 }

@@ -20,9 +20,12 @@ public:
     void publishMessage(const char* topic, const char* message);
 
 private:
+    MqttTaskState state;
+
     const char* mqttServer;
     int mqttPort;
     const char* clientId;
+
     SharedState& sharedState;
     SemaphoreHandle_t& sharedStateMutex;
 

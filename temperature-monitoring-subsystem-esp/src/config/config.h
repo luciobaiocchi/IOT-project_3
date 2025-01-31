@@ -20,4 +20,17 @@
 #define SEND_TOPIC "temperature"
 #define RECIVE_TOPIC "frequency"
 
+//State
+
+enum TaskState{
+    CONNECT,
+    NOT_CONNECT
+};
+
+enum MqttTaskState{
+    WIFI_CONNECTING,
+    MQTT_CONNECTING,
+    CONNECTED
+};
+
 #endif
