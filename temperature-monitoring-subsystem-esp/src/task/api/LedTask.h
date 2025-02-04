@@ -3,6 +3,7 @@
 
 #include "./data/api/SharedState.h"
 #include "./config/config.h"
+#include "./components/api/LedManager.h"
 
 #include <Arduino.h>
 
@@ -18,7 +19,7 @@ public:
 private:
     TaskState state;
 
-    int greenPin, redPin;
+    LedManager greenLed, redLed;
 
     SharedState& sharedState;
     SemaphoreHandle_t& sharedStateMutex;

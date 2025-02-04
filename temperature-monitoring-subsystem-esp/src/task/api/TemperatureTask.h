@@ -3,6 +3,7 @@
 
 #include "./data/api/SharedState.h"
 #include "./config/config.h"
+#include "./components/api/TemperatureSensor.h"
 
 #include <Arduino.h>
 
@@ -15,7 +16,7 @@ public:
 
 private:
     TaskState state;
-    int sensorPin;
+    TemperatureSensor sensor;
     SharedState& sharedState;
     SemaphoreHandle_t& sharedStateMutex;
 };

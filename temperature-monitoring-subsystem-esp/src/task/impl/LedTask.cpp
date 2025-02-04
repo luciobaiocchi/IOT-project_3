@@ -4,13 +4,11 @@ LedTask::LedTask(int greenPin,
                 int redPin, 
                 SharedState& state, 
                 SemaphoreHandle_t& sharedStateMutex)
-    : state(NOT_CONNECT),
-    greenPin(greenPin), 
-    redPin(redPin), 
+    : state(NOT_CONNECT), 
+    greenLed(greenPin),
+    redLed(redPin),
     sharedState(state), 
     sharedStateMutex(sharedStateMutex) {
-    pinMode(greenPin, OUTPUT);
-    pinMode(redPin, OUTPUT);
 }
 
 void LedTask::update() {
@@ -28,13 +26,13 @@ void LedTask::update() {
 
     switch (state) {
         case CONNECT:
-            digitalWrite(greenPin, HIGH);
-            digitalWrite(redPin, LOW);
+            greenLed.turnOn();
+            redLed.turnOff();
             break;
 
         case NOT_CONNECT:
-            digitalWrite(greenPin, LOW);
-            digitalWrite(redPin, HIGH);
+            greenLed.turnOff();
+            redLed.turnOn();
             break;
     }
 }
