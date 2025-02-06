@@ -93,8 +93,6 @@ void MqttTask::publishMessage(const char* topic, const char* message) {
 }
 
 void MqttTask::update() {
-    Serial.print("UPDATE           ZZZ");
-    Serial.println(n++);
     if (WiFi.status() != WL_CONNECTED) {
         state = WIFI_CONNECTING;
     } else if (!mqttClient.connected()) {

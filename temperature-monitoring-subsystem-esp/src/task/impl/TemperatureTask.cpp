@@ -40,12 +40,13 @@ void TemperatureTask::update() {
             if (currentTime - sharedState.getLastReadTime() >= sharedState.getFrequency()) {
                 float temperature = dht.readTemperature();  // Lettura temperatura
                 Serial.print("temp");
-                Serial.println(temperature);
+                Serial.println((int)temperature);
 
                 // Verifica che la lettura sia valida
                 if (!isnan(temperature)) {
-                    sharedState.setTemperature(temperature);
-                    sharedState.setLastReadTime(currentTime);
+
+                    sharedState.setTemperature((int)temperature);
+                    sharedState.setLastReadTime((int)currentTime);
                 }
             }
 =======

@@ -4,6 +4,7 @@ Properties::Properties(){
     modality = Mode::AUTOMATIC;
     position = 0;
     temp = 50;
+    isChangedVar = false;
 }
 
 Mode Properties::getMode(){
@@ -15,6 +16,7 @@ int Properties::getPos(){
 }
 
 void Properties::setMode(Mode modality){
+    isChangedVar = true;
     this->modality = modality;
 }
 
@@ -51,4 +53,12 @@ void Properties::setTemp(int newTemp){
 
 int Properties::getPercPos(){
     return map(position, 0, 90, 0, 100);
+}
+
+bool Properties::isChanged(){
+    if (isChangedVar == true){
+        isChangedVar = false;
+        return true;
+    }
+    return false;
 }

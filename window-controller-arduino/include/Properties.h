@@ -18,11 +18,12 @@ public:
     int getTemp();
     void setTemp(int newTemp);
     int getPercPos();
+    bool isChanged();
 private:
     Mode modality;
     int position;
     int temp;
-
+    bool isChangedVar;
 };
 
 

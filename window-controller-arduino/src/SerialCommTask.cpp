@@ -30,14 +30,23 @@ void SerialCommTask::receive(){
         Msg* msg = MsgService.receiveMsg(); 
         currentState = State::SEND;
 
-        if (msg->getContent().charAt(0) == 'M'){
+        if (msg->getContent().charAt(0) == 'N' && prop.getMode() == Mode::AUTOMATIC){
+            prop.setPercPosition(msg->getContent().substring(1, 4).toInt());
+        }else if (msg->getContent().charAt(0) == 'N' && prop.getMode() == Mode::MANUAL){
+            int temp = msg->getContent().substring(2, 4).toInt();
+            if (msg->getContent().charAt(1) == '-') {
+                temp = -temp;
+            }
+            prop.setTemp(temp);
+        }
+        if (msg->getContent().charAt(0) == 'M' && prop.getMode() == Mode::AUTOMATIC){
             prop.setMode(Mode::MANUAL);
             int temp = msg->getContent().substring(2, 4).toInt();
             if (msg->getContent().charAt(1) == '-') {
                 temp = -temp;
             }
             prop.setTemp(temp);
-        }else if(msg->getContent().charAt(0) == 'A') {
+        }else if(msg->getContent().charAt(0) == 'A' && prop.getMode() == Mode::MANUAL) {
             prop.setMode(Mode::AUTOMATIC);
             prop.setPercPosition(msg->getContent().substring(1, 4).toInt());
         }
@@ -49,12 +58,20 @@ void SerialCommTask::receive(){
 void SerialCommTask::send(){
     currentState = State::RECEIVE;
     char buffer[5];
-
-    if (prop.getMode() == Mode::MANUAL) {
+    if (prop.isChanged()){
+        if (prop.getMode() == Mode::MANUAL) {
         snprintf(buffer, sizeof(buffer), "M%03d", prop.getPercPos()); 
-    } else {
-        strcpy(buffer, "A"); 
+        } else {
+            strcpy(buffer, "A"); 
+        }
+    }else{
+        if (prop.getMode() == Mode::MANUAL) {
+        snprintf(buffer, sizeof(buffer), "N%03d", prop.getPercPos()); 
+        } else {
+            strcpy(buffer, "N"); 
+        }
     }
     
     MsgService.sendMsg(buffer);
+    receive();
 }

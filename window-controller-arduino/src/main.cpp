@@ -17,14 +17,14 @@ void setup() {
 
 
   Task* modeTask = new ModeTask(13, prop);
-  modeTask->init(200);
+  modeTask->init(100);
 
   Task* gateTask = new GateTask(prop, 5);
   gateTask->init(100);
 
 
   Task* serialComm = new SerialCommTask(prop);
-  serialComm->init(200);
+  serialComm->init(100);
 
   Task* lcdTask = new LCDTask(prop);
   lcdTask->init(150);

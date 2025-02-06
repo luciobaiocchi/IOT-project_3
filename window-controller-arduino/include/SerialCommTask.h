@@ -16,7 +16,7 @@ public:
   void tick();
   void receive();
   void send();
-  enum class State{
+  enum State{
     SEND,
     RECEIVE
   };

@@ -47,6 +47,7 @@ public class DataService extends AbstractVerticle {
         } else {
 			if (res.containsKey("new_mode")){
 				this.mState.changeMode();
+                log("change mode");
 			}else if (res.containsKey("stop_alarm" ) && tManager.getTempState() == TempState.ALLARM){
                 tManager.resetAllarm();
             }
@@ -67,7 +68,7 @@ public class DataService extends AbstractVerticle {
         routingContext.response()
 		.putHeader("content-type", "application/json")
 		.end(arr.encodePrettily());
-		log("get" + arr);
+		//log("get" + arr);
     }
 
     private void sendError(int statusCode, HttpServerResponse response) {
