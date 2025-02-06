@@ -8,7 +8,11 @@ public class Mode {
     }
 
     public void changeMode(){
-        isChanged = true;
+        if (isChanged == false){
+            isChanged = true;
+        }
+        System.out.println("IS CHANGED       " + isChanged);
+        
         if (mainState == ModeType.AUTOMATIC) {
             mainState = ModeType.MANUAL;
         } else {

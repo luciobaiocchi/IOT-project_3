@@ -54,8 +54,14 @@ public class SerialLoop extends Thread{
             // Controlla se il primo carattere è 'M' o 'A'
             if (msg != null && !msg.isEmpty()) { // Verifica che il messaggio non sia nullo o vuoto
                 char firstChar = msg.charAt(0);
-                if (firstChar == 'N' && mode.getMode() == ModeType.MANUAL){
+                //msg.length() > 1 per controllare che ci siano dei valori
+                if (firstChar == 'N' && mode.getMode() == ModeType.MANUAL && msg.length() > 1){
+                    log("opening ------------- " + Integer.parseInt(msg.substring(1)));
                     tManager.setOpening(Integer.parseInt(msg.substring(1)));
+                    try {
+                    }catch(NumberFormatException e){
+                        e.printStackTrace();
+                    }
                 }else if(isNewMode(firstChar)){
                     mode.changeMode();
                 }
@@ -66,7 +72,6 @@ public class SerialLoop extends Thread{
             e.printStackTrace();
         }
         try {
-            Thread.sleep(200);
             send();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -85,6 +90,7 @@ public class SerialLoop extends Thread{
 
      */
     void send() throws InterruptedException {
+        log("SEND");
         StringBuilder msg = new StringBuilder();
 
         if (mode.isChanged()){

@@ -68,7 +68,7 @@ public class DataService extends AbstractVerticle {
         routingContext.response()
 		.putHeader("content-type", "application/json")
 		.end(arr.encodePrettily());
-		//log("get" + arr);
+		log("get" + arr);
     }
 
     private void sendError(int statusCode, HttpServerResponse response) {
