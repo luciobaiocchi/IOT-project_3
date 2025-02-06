@@ -5,17 +5,21 @@
 #include "./config/config.h"
 
 #include <Arduino.h>
+#include <DHT.h>  // Include la libreria DHT
+
+#define DHTTYPE DHT11  // Specifica il tipo di sensore (DHT11)
 
 class TemperatureTask {
 public:
-    TemperatureTask(int sensorPin, 
+    TemperatureTask(int dhtPin, 
                     SharedState& state, 
                     SemaphoreHandle_t& sharedStateMutex);
     void update();
 
 private:
     TaskState state;
-    int sensorPin;
+    int dhtPin;
+    DHT dht;  // Oggetto DHT
     SharedState& sharedState;
     SemaphoreHandle_t& sharedStateMutex;
 };

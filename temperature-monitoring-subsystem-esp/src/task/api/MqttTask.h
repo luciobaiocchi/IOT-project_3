@@ -8,6 +8,7 @@
 
 #define MSG_BUFFER_SIZE 50
 
+
 class MqttTask {
 public:
     MqttTask(const char* mqttServer, 

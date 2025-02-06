@@ -1,23 +1,27 @@
 #include "../api/TemperatureTask.h"
 
-TemperatureTask::TemperatureTask(int sensorPin, 
+// Costruttore: inizializza il DHT11
+TemperatureTask::TemperatureTask(int dhtPin, 
                                 SharedState& state, 
                                 SemaphoreHandle_t& sharedStateMutex)
     : state(NOT_CONNECT),
-    sensorPin(sensorPin), 
-    sharedState(state),
-    sharedStateMutex(sharedStateMutex) {
-    pinMode(sensorPin, INPUT);
+      dhtPin(dhtPin),
+      dht(dhtPin, DHTTYPE),  // Inizializza il sensore DHT
+      sharedState(state),
+      sharedStateMutex(sharedStateMutex) {
+    dht.begin();  // Avvia il sensore
 }
 
 void TemperatureTask::update() {
     unsigned long currentTime = millis();
 
+    // Acquisisci il mutex per accedere allo stato condiviso
     while (!xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 
-    if (sharedState.isMqttNetworkConnected() == true){
+    // Verifica lo stato della connessione
+    if (sharedState.isMqttNetworkConnected()) {
         state = CONNECT;
     } else {
         state = NOT_CONNECT;
@@ -25,25 +29,30 @@ void TemperatureTask::update() {
 
     xSemaphoreGive(sharedStateMutex);
 
-    switch (state)
-    {
-    case CONNECT:
-        while (!xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
-            vTaskDelay(pdMS_TO_TICKS(100));
-        }
+    switch (state) {
+        case CONNECT:
+            // Acquisisci il mutex per leggere/scrivere dati
+            while (!xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
+                vTaskDelay(pdMS_TO_TICKS(100));
+            }
 
-        if (currentTime - sharedState.getLastReadTime() >= sharedState.getFrequency()) {
-            int rawValue = analogRead(sensorPin);
-            int temperature = map(rawValue, 0, 4095, -30, 50);
+            // Leggi dal DHT11 solo se è passato il tempo definito dalla frequenza
+            if (currentTime - sharedState.getLastReadTime() >= sharedState.getFrequency()) {
+                float temperature = dht.readTemperature();  // Lettura temperatura
+                Serial.print("temp");
+                Serial.println(temperature);
 
-            sharedState.setTemperature(temperature);
-            sharedState.setLastReadTime(currentTime);
-        }
+                // Verifica che la lettura sia valida
+                if (!isnan(temperature)) {
+                    sharedState.setTemperature(temperature);
+                    sharedState.setLastReadTime(currentTime);
+                }
+            }
 
-        xSemaphoreGive(sharedStateMutex);
-        break;
-    
-    default:
-        break;
+            xSemaphoreGive(sharedStateMutex);
+            break;
+
+        default:
+            break;
     }
 }

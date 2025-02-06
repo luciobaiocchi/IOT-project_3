@@ -88,7 +88,7 @@ public class TempManager {
     private void updateState() {
         int lastTemp = getLast();
         if (lastTemp > Constants.T2 && tState != TempState.TOO_HOT) {
-            System.out.println("START TIMER");
+            //System.out.println("START TIMER");
             this.startTimer();
             this.tState = TempState.TOO_HOT;
         } else if (lastTemp > Constants.T2) {

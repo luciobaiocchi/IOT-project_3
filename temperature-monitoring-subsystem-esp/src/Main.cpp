@@ -16,6 +16,7 @@ void LedTaskFunction(void* parameter);
 void TemperatureTaskFunction(void* parameter);
 void MqttTaskFunction(void* parameter);
 
+
 void LedTaskFunction(void* parameter) {
     LedTask ledTask(LED_GREEN_PIN, LED_RED_PIN, sharedState, sharedStateMutex);
     for (;;) {
@@ -25,7 +26,7 @@ void LedTaskFunction(void* parameter) {
 }
 
 void TemperatureTaskFunction(void* parameter) {
-    TemperatureTask temperatureTask(TEMP_SENSOR_PIN, sharedState, sharedStateMutex);
+    TemperatureTask temperatureTask(DHT_PIN, sharedState, sharedStateMutex);
     for (;;) {
         temperatureTask.update();
         vTaskDelay(sharedState.getFrequency() / portTICK_PERIOD_MS);
@@ -41,7 +42,9 @@ void MqttTaskFunction(void* parameter) {
 }
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
+    Serial.println("start");
+
 
     sharedStateMutex = xSemaphoreCreateMutex();
 
