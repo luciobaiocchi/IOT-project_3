@@ -3,6 +3,7 @@
 
 #include "./data/api/SharedState.h"
 #include "./config/config.h"
+#include "./components/api/TemperatureSensor.h"
 
 #include <Arduino.h>
 #include <DHT.h>  // Include la libreria DHT
@@ -18,8 +19,12 @@ public:
 
 private:
     TaskState state;
+<<<<<<< HEAD
     int dhtPin;
     DHT dht;  // Oggetto DHT
+=======
+    TemperatureSensor sensor;
+>>>>>>> main
     SharedState& sharedState;
     SemaphoreHandle_t& sharedStateMutex;
 };

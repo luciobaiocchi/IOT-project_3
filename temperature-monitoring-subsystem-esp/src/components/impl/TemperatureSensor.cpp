@@ -6,7 +6,6 @@ TemperatureSensor::TemperatureSensor(int pin) : sensorPin(pin) {
 
 int TemperatureSensor::readTemperature() {
     int rawValue = analogRead(sensorPin);
-    int voltage = rawValue * (3.3 / 4095.0);
-    int temperature = (voltage - 0.5) * 100; 
+    int temperature = map(rawValue, 0, 4095, -30, 50);
     return temperature;
 }
