@@ -19,12 +19,8 @@ public:
 
 private:
     TaskState state;
-<<<<<<< HEAD
     int dhtPin;
     DHT dht;  // Oggetto DHT
-=======
-    TemperatureSensor sensor;
->>>>>>> main
     SharedState& sharedState;
     SemaphoreHandle_t& sharedStateMutex;
 };

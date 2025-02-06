@@ -35,7 +35,6 @@ void TemperatureTask::update() {
                 vTaskDelay(pdMS_TO_TICKS(100));
             }
 
-<<<<<<< HEAD
             // Leggi dal DHT11 solo se è passato il tempo definito dalla frequenza
             if (currentTime - sharedState.getLastReadTime() >= sharedState.getFrequency()) {
                 float temperature = dht.readTemperature();  // Lettura temperatura
@@ -44,17 +43,10 @@ void TemperatureTask::update() {
 
                 // Verifica che la lettura sia valida
                 if (!isnan(temperature)) {
-
                     sharedState.setTemperature((int)temperature);
                     sharedState.setLastReadTime((int)currentTime);
                 }
             }
-=======
-        if (currentTime - sharedState.getLastReadTime() >= sharedState.getFrequency()) {        
-            sharedState.setTemperature(sensor.readTemperature());
-            sharedState.setLastReadTime(currentTime);
-        }
->>>>>>> main
 
             xSemaphoreGive(sharedStateMutex);
             break;
