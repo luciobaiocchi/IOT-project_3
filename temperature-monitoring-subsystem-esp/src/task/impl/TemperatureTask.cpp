@@ -5,10 +5,11 @@ TemperatureTask::TemperatureTask(int dhtPin,
                                 SharedState& state, 
                                 SemaphoreHandle_t& sharedStateMutex)
     : state(NOT_CONNECT),
-    sensor(sensorPin), 
-    sharedState(state),
-    sharedStateMutex(sharedStateMutex) {
-    pinMode(sensorPin, INPUT);
+      dhtPin(dhtPin),
+      dht(dhtPin, DHTTYPE),  // Inizializza il sensore DHT
+      sharedState(state),
+      sharedStateMutex(sharedStateMutex) {
+    dht.begin();  // Avvia il sensore
 }
 
 void TemperatureTask::update() {
@@ -34,23 +35,17 @@ void TemperatureTask::update() {
             while (!xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
                 vTaskDelay(pdMS_TO_TICKS(100));
             }
-
             // Leggi dal DHT11 solo se è passato il tempo definito dalla frequenza
             if (currentTime - sharedState.getLastReadTime() >= sharedState.getFrequency()) {
                 float temperature = dht.readTemperature();  // Lettura temperatura
-                Serial.print("temp");
-                Serial.println((int)temperature);
-
                 // Verifica che la lettura sia valida
                 if (!isnan(temperature)) {
                     sharedState.setTemperature((int)temperature);
                     sharedState.setLastReadTime((int)currentTime);
                 }
             }
-
             xSemaphoreGive(sharedStateMutex);
             break;
-
         default:
             break;
     }

@@ -150,7 +150,7 @@ public class SerialLoop extends Thread{
     }
 
     private void log (final String msg){
-        System.out.println("[SERIAL LOOP] " + msg);
+        //System.out.println("[SERIAL LOOP] " + msg);
     }
 
     private boolean isNewMode(final char firstChar){

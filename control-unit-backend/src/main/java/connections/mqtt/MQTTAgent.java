@@ -14,16 +14,15 @@ public class MQTTAgent extends AbstractVerticle {
 
     private MqttClient client;
     private int updateFrequency = 5000;
-	private TempManager tm;
+    private TempManager tm;
 
-	public MQTTAgent (TempManager tm){
-		this.tm = tm;
-	}
+    public MQTTAgent(TempManager tm) {
+        this.tm = tm;
+    }
 
     @Override
     public void start() {
         client = MqttClient.create(vertx);
-
         connectToBroker();
     }
 
@@ -32,12 +31,36 @@ public class MQTTAgent extends AbstractVerticle {
             if (connection.succeeded()) {
                 log("Connesso al broker MQTT!");
 
+                // Imposta il publishHandler per gestire i messaggi in arrivo
                 client.publishHandler(message -> {
-                    String receivedTemperature = message.payload().toString();
-					tm.addTemp(Integer.parseInt(receivedTemperature));
-					log(String.valueOf(tm.getLast()));
-                }).subscribe(TOPIC_SUBSCRIBE, MqttQoS.AT_LEAST_ONCE.value());
+                    // Recupera il payload come stringa
+                    String payload = message.payload().toString();
+                    log("Messaggio ricevuto:" + payload);
 
+                    // Se il messaggio è nel formato "Temperature: XX", estrai il valore numerico
+                    try {
+                        int temperature = Integer.parseInt(payload);
+                        tm.addTemp(temperature);
+                        log("Temperatura elaborata: " + tm.getLast());
+                    } catch (NumberFormatException e) {
+                        log("Errore nel parsing della temperatura: " + payload);
+                    }
+                    /*if (parts.length > 1) {
+                    } else {
+                        log("Messaggio non nel formato atteso: " + payload);
+                    }*/
+                });
+
+                // Sottoscrivi al topic "temperature" e logga il risultato
+                client.subscribe(TOPIC_SUBSCRIBE, MqttQoS.AT_LEAST_ONCE.value(), subscribeResult -> {
+                    if (subscribeResult.succeeded()) {
+                        log("Sottoscrizione al topic '" + TOPIC_SUBSCRIBE + "' avvenuta con successo!");
+                    } else {
+                        log("Errore nella sottoscrizione al topic '" + TOPIC_SUBSCRIBE + "': " + subscribeResult.cause());
+                    }
+                });
+
+                // Invia la frequenza iniziale
                 sendFrequency(updateFrequency);
             } else {
                 log("Connessione fallita. Riprovo tra 5 secondi...");
@@ -45,6 +68,7 @@ public class MQTTAgent extends AbstractVerticle {
             }
         });
 
+        // Gestione della disconnessione
         client.closeHandler(v -> {
             log("Connessione persa. Riconnessione...");
             connectToBroker();
@@ -54,11 +78,13 @@ public class MQTTAgent extends AbstractVerticle {
     public void sendFrequency(int frequency) {
         if (client.isConnected()) {
             updateFrequency = frequency;
-            client.publish(TOPIC_SEND,
-                    Buffer.buffer(String.valueOf(frequency)),
-                    MqttQoS.AT_LEAST_ONCE,
-                    false,
-                    false);
+            client.publish(
+                TOPIC_SEND,
+                Buffer.buffer(String.valueOf(frequency)),
+                MqttQoS.AT_LEAST_ONCE,
+                false,
+                false
+            );
             log("Frequenza inviata: " + frequency + " ms");
         } else {
             log("Non connesso! Impossibile inviare la frequenza.");
@@ -66,6 +92,6 @@ public class MQTTAgent extends AbstractVerticle {
     }
 
     private void log(String msg) {
-        //System.out.println("[MQTT AGENT] " + msg);
+        System.out.println("[MQTT AGENT] " + msg + "]");
     }
 }

@@ -9,19 +9,19 @@ public class Logic extends Thread{
     private final Mode mode = new Mode();
     private final TempManager tManager = new TempManager(200);
     private final Vertx vertx;
-    //private final MQTTAgent mqttAgent;
+    private final MQTTAgent mqttAgent;
 
     public Logic() {
         vertx = Vertx.vertx();
-        //mqttAgent = new MQTTAgent(tManager);
+        mqttAgent = new MQTTAgent(tManager);
 
         DataService service = new DataService(8080, tManager, mode);
         SerialLoop serial = new SerialLoop(tManager, mode);
         serial.start();
         
         vertx.deployVerticle(service);
-        //vertx.deployVerticle(mqttAgent);
-        //vertx.setPeriodic(1000, id -> run());
+        vertx.deployVerticle(mqttAgent);
+        vertx.setPeriodic(1000, id -> run());
     }
 
     public void run() {

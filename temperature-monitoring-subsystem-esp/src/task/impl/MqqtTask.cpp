@@ -1,11 +1,10 @@
 #include "../api/MqttTask.h"
 
-int n = 0;
 MqttTask::MqttTask(const char* mqttServer, 
-                    int mqttPort, 
-                    const char* clientId, 
-                    SharedState& sharedState,
-                    SemaphoreHandle_t& sharedStateMutex)
+                 int mqttPort, 
+                 const char* clientId, 
+                 SharedState& sharedState,
+                 SemaphoreHandle_t& sharedStateMutex)
     : state(WIFI_CONNECTING),
     mqttServer(mqttServer), 
     mqttPort(mqttPort), 
@@ -23,7 +22,7 @@ MqttTask::MqttTask(const char* mqttServer,
 }
 
 void MqttTask::connectToWiFi() {
-    Serial.println("\nAvvio connessione WiFi...");
+    Serial.println("\nConnessione WiFi in corso...");
     
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
@@ -35,124 +34,111 @@ void MqttTask::connectToWiFi() {
         Serial.print(".");
     }
 
-    while (!xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
-        vTaskDelay(pdMS_TO_TICKS(100));
+    if(xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
+        sharedState.setWifiNetworkConnected(true);
+        xSemaphoreGive(sharedStateMutex);
     }
 
-    sharedState.setWifiNetworkConnected(true);
-    xSemaphoreGive(sharedStateMutex);
-
-    Serial.println("\nConnesso al WiFi!");
-    Serial.print("Indirizzo IP: ");
+    Serial.println("\nWiFi connesso");
+    Serial.print("IP: ");
     Serial.println(WiFi.localIP());
 }
 
 void MqttTask::connectToMqtt() {
-    Serial.println("Connessione al server MQTT...");
+    Serial.println("Connessione MQTT...");
     
     while (!mqttClient.connected()) {
-        String clientId = String("esp32-client-") + String(random(0xffff), HEX);
+        String clientId = String("esp32-") + String(random(0xffff), HEX);
 
-        if (mqttClient.connect(clientId.c_str())) {
-            while (!xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
-                vTaskDelay(pdMS_TO_TICKS(100));
+        if(mqttClient.connect(clientId.c_str())) {
+            if(xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
+                sharedState.setMqttNetworkConnected(true);
+                xSemaphoreGive(sharedStateMutex);
             }
-
-            sharedState.setMqttNetworkConnected(true);
-            xSemaphoreGive(sharedStateMutex);
-
-            Serial.println("Connesso a MQTT!");
+            
             mqttClient.subscribe(RECIVE_TOPIC);
-            Serial.println(String("Iscritto al topic ") + RECIVE_TOPIC);
-        } else {
-            Serial.print("Connessione fallita, rc=");
-            Serial.print(mqttClient.state());
-            vTaskDelay(pdMS_TO_TICKS(5000));
+            Serial.println("Connesso al broker MQTT");
+            break;
         }
+        
+        Serial.print("Errore connessione MQTT: ");
+        Serial.println(mqttClient.state());
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
 
 void MqttTask::onMessageReceived(char* topic, byte* payload, unsigned int length) {
+    char buffer[10];
+    size_t len = min(length, sizeof(buffer)-1);
+    memcpy(buffer, payload, len);
+    buffer[len] = '\0';
 
-    String message;
-    for (unsigned int i = 0; i < length; i++) {
-        message += (char)payload[i];
-    }
-    Serial.println(message);
-
-    int newFrequency = message.toInt();
-    if (newFrequency > 0) {
-        receivedFrequency = newFrequency;
+    int newFreq = atoi(buffer);
+    if(newFreq >= 1000 && newFreq <= 60000) {  // Frequenza valida tra 1 e 60 secondi
+        receivedFrequency = newFreq;
     } else {
-        Serial.println("Errore: valore di frequenza non valido");
+        Serial.println("Frequenza non valida");
     }
 }
 
-void MqttTask::publishMessage(const char* topic, const char* message) {
-    mqttClient.publish(topic, message);
+void MqttTask::publishMessage(const char* topic, const char *value) {
+    char msg[4];
+    snprintf(msg, sizeof(msg), "%d", value);
+    mqttClient.publish(topic, msg);
+    Serial.print("SEND :");
+    Serial.println(msg);
+
 }
+
 
 void MqttTask::update() {
-    if (WiFi.status() != WL_CONNECTED) {
-        state = WIFI_CONNECTING;
-    } else if (!mqttClient.connected()) {
-        state = MQTT_CONNECTING;
-    } else {
-        state = CONNECTED;
-    }
+    // Aggiorna lo stato della connessione
+    state = (!WiFi.isConnected()) ? WIFI_CONNECTING : 
+           (!mqttClient.connected()) ? MQTT_CONNECTING : CONNECTED;
 
-
-    switch (state) {
+    switch(state) {
         case WIFI_CONNECTING:
-            while (!xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
-                vTaskDelay(pdMS_TO_TICKS(100));
+            if(xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
+                sharedState.setWifiNetworkConnected(false);
+                xSemaphoreGive(sharedStateMutex);
             }
-            sharedState.setWifiNetworkConnected(false);
-            xSemaphoreGive(sharedStateMutex);
             connectToWiFi();
             break;
 
         case MQTT_CONNECTING:
-            while (!xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
-                vTaskDelay(pdMS_TO_TICKS(100));
+            if(xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
+                sharedState.setMqttNetworkConnected(false);
+                xSemaphoreGive(sharedStateMutex);
             }
-            sharedState.setMqttNetworkConnected(false);
-            xSemaphoreGive(sharedStateMutex);
             connectToMqtt();
             break;
 
         case CONNECTED:
             mqttClient.loop();
 
-            if (receivedFrequency > 0 && receivedFrequency != sharedState.getFrequency()) {
-                while (!xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
-                    vTaskDelay(pdMS_TO_TICKS(100));
+            // Aggiorna la frequenza se necessario
+            if(receivedFrequency > 0 && receivedFrequency != sharedState.getFrequency()) {
+                if(xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
+                    sharedState.setFrequency(receivedFrequency);
+                    Serial.printf("Nuova frequenza: %d ms\n", receivedFrequency);
+                    receivedFrequency = 0;
+                    xSemaphoreGive(sharedStateMutex);
                 }
-
-                sharedState.setFrequency(receivedFrequency);
-                Serial.println("Frequenza aggiornata in sharedState: " + String(receivedFrequency));
-                receivedFrequency = 0;
-
-                xSemaphoreGive(sharedStateMutex);
             }
 
-
+            // Invia il dato termico
             unsigned long now = millis();
-            if (now - lastMsgTime > sharedState.getFrequency()) {
-
-                while (!xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
-                    vTaskDelay(pdMS_TO_TICKS(100));
+            if(now - lastMsgTime >= sharedState.getFrequency()) {
+                if(xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
+                    int temperature = sharedState.getTemperature();
+                    
+                    // Clamping del valore tra -30 e 50
+                    temperature = constrain(temperature, -30, 50);
+                    
+                    publishMessage(SEND_TOPIC, (char*)temperature);
+                    lastMsgTime = now;
+                    xSemaphoreGive(sharedStateMutex);
                 }
-
-                lastMsgTime = now;
-
-                char msg[MSG_BUFFER_SIZE];
-                int tempMsg = sharedState.getTemperature();
-                snprintf(msg, MSG_BUFFER_SIZE, "%d", tempMsg);
-
-                xSemaphoreGive(sharedStateMutex);
-
-                publishMessage(SEND_TOPIC, msg);
             }
             break;
     }
