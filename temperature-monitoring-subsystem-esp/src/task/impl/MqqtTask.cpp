@@ -74,7 +74,7 @@ void MqttTask::onMessageReceived(char* topic, byte* payload, unsigned int length
     buffer[len] = '\0';
 
     int newFreq = atoi(buffer);
-    if(newFreq >= 1000 && newFreq <= 60000) {  // Frequenza valida tra 1 e 60 secondi
+    if(newFreq >= 1000 && newFreq <= 2000) {  // Frequenza valida tra 1 e 60 secondi
         receivedFrequency = newFreq;
     } else {
         Serial.println("Frequenza non valida");

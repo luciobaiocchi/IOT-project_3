@@ -13,7 +13,6 @@ public class MQTTAgent extends AbstractVerticle {
     private static final String TOPIC_SEND = "frequency";
 
     private MqttClient client;
-    private int updateFrequency = 5000;
     private TempManager tm;
 
     public MQTTAgent(TempManager tm) {
@@ -35,7 +34,7 @@ public class MQTTAgent extends AbstractVerticle {
                 client.publishHandler(message -> {
                     // Recupera il payload come stringa
                     String payload = message.payload().toString();
-                    log("Messaggio ricevuto:" + payload);
+                    log("Messaggio ricevuto: [" + payload + "]");
 
                     // Se il messaggio è nel formato "Temperature: XX", estrai il valore numerico
                     try {
@@ -61,7 +60,7 @@ public class MQTTAgent extends AbstractVerticle {
                 });
 
                 // Invia la frequenza iniziale
-                sendFrequency(updateFrequency);
+                sendFrequency(tm.getFreq());
             } else {
                 log("Connessione fallita. Riprovo tra 5 secondi...");
                 vertx.setTimer(5000, id -> connectToBroker());
@@ -75,9 +74,8 @@ public class MQTTAgent extends AbstractVerticle {
         });
     }
 
-    public void sendFrequency(int frequency) {
+    public void sendFrequency(final int frequency) {
         if (client.isConnected()) {
-            updateFrequency = frequency;
             client.publish(
                 TOPIC_SEND,
                 Buffer.buffer(String.valueOf(frequency)),
@@ -91,7 +89,7 @@ public class MQTTAgent extends AbstractVerticle {
         }
     }
 
-    private void log(String msg) {
-        System.out.println("[MQTT AGENT] " + msg + "]");
+    private void log(final String msg) {
+        System.out.println("[MQTT AGENT] " + msg);
     }
 }
