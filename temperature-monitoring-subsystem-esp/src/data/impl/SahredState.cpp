@@ -1,8 +1,9 @@
 #include "../api/SharedState.h"
-
+#include "./config/config.h"
 
 SharedState::SharedState()
-    : temperature(TS), frequency(FS), wifiNetwork(false), mqttNetwork(false), lastReadTime(0) {}
+    : temperature(TS), frequency(FS), wifiNetwork(false), mqttNetwork(false), lastReadTime(0) {
+    }
 
 int SharedState::getTemperature() const {
     return temperature;

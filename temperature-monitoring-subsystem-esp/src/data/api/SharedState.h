@@ -3,9 +3,6 @@
 
 #include <Arduino.h>
 
-#define FS 1000
-#define TS 0
-
 class SharedState {
 public:
     SharedState();

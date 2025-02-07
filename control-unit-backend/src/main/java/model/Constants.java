@@ -4,8 +4,11 @@ public class Constants {
     public Constants(){
 
     }
-    public static int F1 = 1000;
-    public static int F2 = 2000;
+    /*
+     * 
+     */
+    public static int F1 = 1;
+    public static int F2 = 2;
 
     public static int T1 = 20;
     public static int T2 = 35;

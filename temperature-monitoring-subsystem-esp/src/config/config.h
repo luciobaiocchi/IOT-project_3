@@ -21,6 +21,14 @@
 #define SEND_TOPIC "temperature"
 #define RECIVE_TOPIC "frequency"
 
+//max and min frequency
+#define FS 1 // standard frequency
+#define MIN_F 0.1 // one read every 10 sec (1/0.1 = 10)
+#define MAX_F 2 // two read every 1 sec (1/2 = 0.5)
+#define ONE_SECOND 1000 // period T of temperature reading
+
+#define TS 0
+
 //State
 
 enum TaskState{

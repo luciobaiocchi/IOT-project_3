@@ -14,6 +14,7 @@ TemperatureTask::TemperatureTask(int dhtPin,
 
 void TemperatureTask::update() {
     unsigned long currentTime = millis();
+    int period = 0;
 
     // Acquisisci il mutex per accedere allo stato condiviso
     while (!xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
@@ -35,13 +36,16 @@ void TemperatureTask::update() {
             while (!xSemaphoreTake(sharedStateMutex, pdMS_TO_TICKS(5000))) {
                 vTaskDelay(pdMS_TO_TICKS(100));
             }
+            //calcolo il periodo facendo 1sec/freq 
+            period = ONE_SECOND / sharedState.getFrequency();
             // Leggi dal DHT11 solo se è passato il tempo definito dalla frequenza
-            if (currentTime - sharedState.getLastReadTime() >= sharedState.getFrequency()) {
+            if (currentTime - sharedState.getLastReadTime() >= period) {
                 float temperature = dht.readTemperature();  // Lettura temperatura
                 // Verifica che la lettura sia valida
                 if (!isnan(temperature)) {
                     sharedState.setTemperature((int)temperature);
-                    sharedState.setLastReadTime((int)currentTime);
+                    currentTime = millis();
+                    sharedState.setLastReadTime((unsigned long)currentTime);
                 }
             }
             xSemaphoreGive(sharedStateMutex);
