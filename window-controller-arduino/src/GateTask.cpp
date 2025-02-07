@@ -16,5 +16,7 @@ void GateTask::tick() {
             gate->move(pot->getPos());
             prop.setPosition(pot->getPos());
         }
+    }else{
+        gate->move(prop.getPos());
     }
 }
